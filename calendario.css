@@ -1,0 +1,377 @@
+/* =========================
+   GENERAL
+========================= */
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, Helvetica, sans-serif;
+    background: #f5f7fa;
+    color: #14213d;
+}
+
+
+/* =========================
+   PÁGINA
+========================= */
+
+.calendar-page {
+    width: 100%;
+    max-width: 1050px;
+    margin: 0 auto;
+    padding: 30px 35px 50px;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+.calendar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 30px;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+}
+
+.back-button {
+    width: 44px;
+    height: 44px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: white;
+    border: 1px solid #dfe6ef;
+    border-radius: 10px;
+
+    text-decoration: none;
+    color: #19385f;
+
+    font-size: 25px;
+}
+
+.eyebrow {
+    display: block;
+    margin-bottom: 5px;
+
+    color: #2478f2;
+
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+}
+
+.calendar-header h1 {
+    font-size: 25px;
+    color: #14213d;
+}
+
+
+/* =========================
+   BOTONES SEMANA
+========================= */
+
+.header-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.week-button {
+    width: 42px;
+    height: 42px;
+
+    border: 1px solid #dfe6ef;
+    border-radius: 10px;
+
+    background: white;
+
+    color: #355d8c;
+
+    font-size: 25px;
+
+    cursor: pointer;
+}
+
+.week-button:hover {
+    background: #f5f8fc;
+}
+
+
+/* =========================
+   CALENDARIO
+========================= */
+
+.calendar {
+    background: white;
+
+    border: 1px solid #e1e7ee;
+
+    border-radius: 15px;
+
+    overflow: hidden;
+
+    box-shadow: 0 3px 15px rgba(30, 50, 80, 0.05);
+}
+
+
+/* =========================
+   DÍA
+========================= */
+
+.day-group {
+    display: flex;
+
+    min-height: 105px;
+
+    border-bottom: 1px solid #e7ebf0;
+}
+
+.day-group:last-child {
+    border-bottom: none;
+}
+
+
+/* =========================
+   COLUMNA DEL DÍA
+========================= */
+
+.day-column {
+    width: 110px;
+
+    flex-shrink: 0;
+
+    display: flex;
+    flex-direction: column;
+
+    align-items: center;
+    justify-content: center;
+
+    background: #fbfcfd;
+
+    border-right: 1px solid #e3e8ef;
+}
+
+.day-column span {
+    font-size: 14px;
+    color: #5f728d;
+}
+
+.day-column strong {
+    margin-top: 3px;
+
+    font-size: 27px;
+
+    color: #14213d;
+}
+
+
+/* =========================
+   EVENTOS
+========================= */
+
+.events {
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+}
+
+
+/* =========================
+   TARJETA EVENTO
+========================= */
+
+.event-card {
+    min-height: 104px;
+
+    display: flex;
+
+    align-items: center;
+
+    gap: 18px;
+
+    padding: 18px 20px;
+
+    border-bottom: 1px solid #edf0f3;
+
+    text-decoration: none;
+
+    color: inherit;
+
+    transition: 0.2s ease;
+}
+
+.event-card:last-child {
+    border-bottom: none;
+}
+
+.event-card:hover {
+    background: #f8fafc;
+}
+
+
+/* =========================
+   HORA
+========================= */
+
+.event-time {
+    width: 55px;
+
+    flex-shrink: 0;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    color: #263e5d;
+}
+
+
+/* =========================
+   INFORMACIÓN
+========================= */
+
+.event-info {
+    flex: 1;
+
+    display: flex;
+    flex-direction: column;
+
+    gap: 6px;
+}
+
+.event-info strong {
+    font-size: 15px;
+    color: #14213d;
+}
+
+.event-info span {
+    font-size: 14px;
+    color: #617590;
+}
+
+
+/* =========================
+   ESTADOS
+========================= */
+
+.status {
+    min-width: 76px;
+
+    text-align: center;
+
+    padding: 8px 10px;
+
+    border-radius: 13px;
+
+    font-size: 11px;
+
+    font-weight: 700;
+}
+
+
+/* ATRASADO */
+
+.status.atrasado {
+    background: #ffc5ca;
+    color: #c91f2b;
+}
+
+
+/* ALERTA */
+
+.status.alerta {
+    background: #ffe89a;
+    color: #a66a00;
+}
+
+
+/* BIEN */
+
+.status.bien {
+    background: #baf0d1;
+    color: #16844e;
+}
+
+
+/* =========================
+   FLECHA
+========================= */
+
+.event-arrow {
+    font-size: 25px;
+    color: #7387a0;
+}
+
+
+/* =========================
+   REMATE ATRASADO DESTACADO
+========================= */
+
+.event-card.atrasado {
+    background: #fff5f6;
+}
+
+.event-card.atrasado:hover {
+    background: #ffeff1;
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media (max-width: 700px) {
+
+    .calendar-page {
+        padding: 20px 15px;
+    }
+
+    .calendar-header h1 {
+        font-size: 19px;
+    }
+
+    .day-column {
+        width: 70px;
+    }
+
+    .event-card {
+        gap: 10px;
+        padding: 14px 12px;
+    }
+
+    .event-time {
+        width: 45px;
+        font-size: 13px;
+    }
+
+    .event-info strong {
+        font-size: 13px;
+    }
+
+    .event-info span {
+        font-size: 12px;
+    }
+
+    .status {
+        min-width: auto;
+        padding: 6px 8px;
+        font-size: 9px;
+    }
+
+    .event-arrow {
+        font-size: 20px;
+    }
+}
