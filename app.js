@@ -44,25 +44,65 @@ const RESULT_BRANCHES = {
     }
 };
 const data = window.RematesData.items.map(x => ({ ...x, avatar: x.avatarUrl }));
-let active = 0, week = 0, activeFlowView = 'list';
-const sc = s => s === 'ATRASADO' ? 'late' : s === 'ALERTA' ? 'alert' : 'good';
+let active = 0, week = window.RematesData.getWeek(), statusFilter = '', activeFlowView = 'list';
+const STATUS_CLASS = { ATRASADO: 'late', ALERTA: 'alert', SUSPENDIDO: 'paused', CANCELADO: 'cancelled' };
+const sc = s => STATUS_CLASS[s] || 'good';
+const isStopped = item => item.status === 'SUSPENDIDO' || item.status === 'CANCELADO';
+const isFinished = item => {
+    const branch = RESULT_BRANCHES[item.resultOutcome];
+    return Boolean(branch) && branch.tasks.every(([key]) => (item.resultTasks || {})[key]);
+};
+const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 const getFlowStage = item => Math.min(TASKS.length + 1, Math.max(1, Number(item.flowStage) || 1));
 const completedCount = item => getFlowStage(item) - 1;
-const updateMetrics = () => {
-    document.querySelector('#metricTotal').textContent = data.length;
-    document.querySelector('#metricAlert').textContent = data.filter(x => x.status === 'ALERTA').length;
-    document.querySelector('#metricLate').textContent = data.filter(x => x.status === 'ATRASADO').length;
-    document.querySelector('#metricGood').textContent = data.filter(x => x.status === 'BIEN').length;
+// Filtros del tablero: semana visible, tarjeta de estado activa y texto buscado; se combinan entre sí.
+const STATUS_FILTERS = {
+    ALERTA: x => x.status === 'ALERTA',
+    ATRASADO: x => x.status === 'ATRASADO',
+    BIEN: x => x.status === 'BIEN',
+    DETENIDO: isStopped
 };
+const weekRange = window.RematesData.weekRange;
+const updateMetrics = items => {
+    document.querySelector('#metricTotal').textContent = items.length;
+    document.querySelector('#metricAlert').textContent = items.filter(STATUS_FILTERS.ALERTA).length;
+    document.querySelector('#metricLate').textContent = items.filter(STATUS_FILTERS.ATRASADO).length;
+    document.querySelector('#metricGood').textContent = items.filter(STATUS_FILTERS.BIEN).length;
+    document.querySelector('#metricStopped').textContent = items.filter(STATUS_FILTERS.DETENIDO).length;
+    document.querySelector('.metrics').classList.toggle('filtered', Boolean(statusFilter));
+    document.querySelectorAll('[data-filter]').forEach(b => {
+        const on = Boolean(statusFilter) && b.dataset.filter === statusFilter;
+        b.classList.toggle('active', on);
+        b.setAttribute('aria-pressed', on);
+    });
+};
+function emptyList(q, weekTotal) {
+    const text = q ? `No encontramos remates para “${esc(q)}”${statusFilter ? ' con ese estado' : ''} en esta semana.`
+        : weekTotal ? 'No hay remates con ese estado en esta semana.'
+        : 'No hay remates programados para esta semana.';
+    return `<div class="empty">${text}${q || statusFilter ? '<br><button class="week-pick" type="button" onclick="clearFilters()">Quitar filtros</button>' : ''}</div>`;
+}
+function clearFilters() {
+    statusFilter = '';
+    search.value = '';
+    render();
+}
 function render(q = '') {
-    q = q.toLowerCase();
-    const items = data.filter(x => Object.values(x).join(' ').toLowerCase().includes(q));
+    q = q.trim().toLowerCase();
+    const range = weekRange(week);
+    const weekItems = data.filter(x => x.iso >= range.from && x.iso <= range.to);
+    const items = weekItems.filter(STATUS_FILTERS[statusFilter] || (() => true)).filter(x => [x.title, x.place, x.date, x.time, x.stage, x.person, x.status].join(' ').toLowerCase().includes(q));
+    const urgent = weekItems.filter(x => x.status === 'ATRASADO' || x.status === 'ALERTA').sort((a, b) => (a.status === 'ATRASADO' ? 0 : 1) - (b.status === 'ATRASADO' ? 0 : 1));
     list.innerHTML = items.length
-        ? items.map(x => `<div class="row ${x.id === active ? 'selected' : ''}" data-id="${x.id}"><div class="property"><img src="${x.img}"><div class="property-info" data-meta="${x.place} · ${x.date} · ${x.time}">${x.title}<div class="mobile-extra"><small>${x.stage}<br>${x.person}</small><small class="due">${x.due}</small></div></div></div><div>${x.place}</div><div>${x.date}<br>${x.time}</div><div>${x.stage}</div><div class="person"><img class="mini" src="${x.avatar}">${x.person}</div><div><span class="status ${sc(x.status)}">${x.status}</span></div><div class="chev">›</div></div>`).join('')
-        : `<div class="empty">No encontramos remates para “${q}”.</div>`;
+        ? items.map(x => `<div class="row ${x.id === active ? 'selected' : ''}" data-id="${x.id}"><div class="property"><img src="${x.img}"><div class="property-info" data-meta="${x.place} · ${x.date} · ${x.time}"><div class="property-head"><span>${x.title}</span><span class="status ${sc(x.status)}">${x.status}</span></div><div class="mobile-extra"><small>${x.stage}<br>${x.person}</small><small class="due">${x.due}</small></div></div></div><div>${x.place}</div><div>${x.date}<br>${x.time}</div><div>${x.stage}</div><div class="person"><img class="mini" src="${x.avatar}">${x.person}</div><div><span class="status ${sc(x.status)}">${x.status}</span></div><div class="chev">›</div></div>`).join('')
+        : emptyList(q, weekItems.length);
     document.querySelectorAll('.row').forEach(e => e.onclick = () => select(+e.dataset.id));
-    attention.innerHTML = data.slice(0, 2).map(x => `<div class="attention"><div class="property"><img src="${x.img}"><div>${x.title}<small>${x.place}</small></div></div><span class="status ${sc(x.status)}">${x.status}</span><div class="deadline"><svg class="icon"><use href="#calendar"/></svg><div><strong>${x.due}</strong><span>${x.stage}</span></div></div><b>›</b></div>`).join('');
-    updateMetrics();
+    attention.innerHTML = urgent.map(x => `<div class="attention" data-id="${x.id}"><div class="property"><img src="${x.img}"><div>${x.title}<small>${x.place}</small></div></div><span class="status ${sc(x.status)}">${x.status}</span><div class="deadline"><svg class="icon"><use href="#calendar"/></svg><div><strong>${x.due}</strong><span>${x.stage}</span></div></div><b>›</b></div>`).join('') || '<div class="empty">Ningún remate requiere atención.</div>';
+    attention.querySelectorAll('[data-id]').forEach(e => e.onclick = () => select(+e.dataset.id));
+    weekLabel.textContent = range.label;
+    showAll.querySelector('span').textContent = range.label;
+    listCount.textContent = items.length === weekItems.length ? items.length : `${items.length} de ${weekItems.length}`;
+    updateMetrics(weekItems);
 }
 function renderTaskList(item, compact = false) {
     const stage = getFlowStage(item);
@@ -75,7 +115,7 @@ function renderTaskList(item, compact = false) {
         const number = start + offset + 1;
         const state = number <= completed ? 'done' : number === stage ? 'current' : 'pending';
         const icon = state === 'done' ? '✓' : state === 'current' ? '!' : number;
-        const label = state === 'done' ? 'Completada' : state === 'current' ? 'En proceso' : 'Pendiente';
+        const label = state === 'done' ? 'Completada' : state !== 'current' ? 'Pendiente' : item.status === 'SUSPENDIDO' ? 'Suspendida' : item.status === 'CANCELADO' ? 'Cancelada' : 'En proceso';
         return `<li class="flow-task ${state}"><span class="flow-marker">${icon}</span><span class="flow-task-name">${task}</span><span class="flow-task-state">${label}</span></li>`;
     }).join('');
 }
@@ -86,7 +126,7 @@ function show(x) {
     const currentTask = TASKS[stage - 1];
     const dateYear = x.iso.slice(0, 4);
     const isFlowComplete = completed === TASKS.length && x.status === 'BIEN';
-    const urgentTitle = isFlowComplete ? 'Remate completado' : x.stage;
+    const urgentTitle = isFlowComplete ? 'Remate completado' : isStopped(x) ? `Remate ${x.status.toLowerCase()}` : x.stage;
     const urgentText = isFlowComplete ? 'Proceso completado' : x.due;
 
     detail.innerHTML = `
@@ -108,12 +148,12 @@ function show(x) {
                 </div>
                 <ol class="process-preview">${renderTaskList(x, true)}</ol>
                 <label class="stage-check">
-                    <input type="checkbox" ${stage > TASKS.length ? 'checked disabled' : ''} onchange="completeStage(${x.id})">
+                    <input type="checkbox" ${stage > TASKS.length ? 'checked disabled' : isStopped(x) ? 'disabled' : ''} onchange="completeStage(${x.id})">
                     <span>${currentTask ? `Marcar <strong>${currentTask}</strong> como completada` : 'Proceso completado'}</span>
                 </label>
                 <div class="flow-open-actions">
-                    <button class="flow-open-button" type="button" onclick="openFlow(${x.id})">Ver flujo completo →</button>
-                    <button class="flow-diagram-button" type="button" aria-label="Ver diagrama del proceso" title="Ver diagrama del proceso" onclick="openFlow(${x.id}, 'diagram')">↗</button>
+                    <button class="flow-open-button" type="button" onclick="openFlow(${x.id}, 'diagram')">Ver flujo completo →</button>
+                    <button class="flow-diagram-button" type="button" aria-label="Ver lista de tareas" title="Ver lista de tareas" onclick="openFlow(${x.id})">↗</button>
                 </div>
             </section>
             <div class="urgent ${sc(x.status)}">
@@ -148,13 +188,13 @@ function show(x) {
 function renderFlow(item) {
     flowDialog.classList.toggle('diagram-mode', activeFlowView === 'diagram');
     if (activeFlowView === 'diagram') {
-        flowContent.innerHTML = renderFlowDiagram(item);
+        mountFlowDiagram(item);
         return;
     }
     const completed = completedCount(item);
     const percentage = Math.round(completed / TASKS.length * 100);
     const stage = getFlowStage(item);
-    const stateLabel = item.status === 'ATRASADO' ? 'ATRASADO' : item.status === 'BIEN' ? 'BIEN' : 'ALERTA';
+    const stateLabel = item.status;
     flowContent.innerHTML = `
         <header class="flow-heading">
             <p class="flow-eyebrow">FLUJO DEL REMATE</p>
@@ -166,136 +206,25 @@ function renderFlow(item) {
             </div>
         </header>
         <ol class="flow-list">${renderTaskList(item)}</ol>
-        ${stage <= TASKS.length ? `<label class="flow-check"><input type="checkbox" onchange="completeStage(${item.id})"><span>Marcar <strong>${TASKS[stage - 1]}</strong> como completada</span></label>` : '<p class="flow-complete">✓ Las 15 tareas están completadas.</p>'}
+        ${flowStopNotice(item)}${isStopped(item) ? '' : stage <= TASKS.length ? `<label class="flow-check"><input type="checkbox" onchange="completeStage(${item.id})"><span>Marcar <strong>${TASKS[stage - 1]}</strong> como completada</span></label>` : '<p class="flow-complete">✓ Las 15 tareas están completadas.</p>'}
+        ${flowLegalActions(item)}
     `;
 }
 
-function renderFlowDiagram(item) {
-    const completed = completedCount(item);
-    const currentStage = getFlowStage(item);
-    const selectedOutcome = item.resultOutcome || '';
-    const outcomeTasks = item.resultTasks || {};
-    const activeBranch = RESULT_BRANCHES[selectedOutcome];
-    const completedBranchTasks = activeBranch
-        ? activeBranch.tasks.filter(([key]) => outcomeTasks[key]).length
-        : 0;
-    const branchComplete = Boolean(activeBranch) && completedBranchTasks === activeBranch.tasks.length;
-    const diagramTasks = [
-        ['Propiedad aceptada', 'Sistema, crea workflow', 'system', 1],
-        ['Asignar gestor y postor', 'Asignador por definir', 'person', 2],
-        ['Generar carta vale vista', 'Asignador o sistema', 'person', 3],
-        ['Enviar carta al GG', 'Sistema, email con adjunto', 'system', 4],
-        ['GG envía carta al banco', 'Gerente general, su buzón', 'person', 5],
-        ['Generar formulario', 'Gestor', 'person', 6],
-        ['Legal pre-entrega', 'Hasta 1 h antes del paso 9', 'person', 7],
-        ['Retirar vale vista', 'Gestor, en el banco', 'person', 8],
-        ['Entregar VV y formulario', 'Gestor, en el juzgado', 'person', 9],
-        ['Registrar evidencia', 'Gestor, fotos timbradas', 'person', 10],
-        ['Legal final', 'Hasta 1 h antes del remate', 'person', 11],
-        ['Preparar participación', 'Postor, link y monto', 'person', 12],
-        ['Alertas pre-remate', 'Sistema, de 24 h a 15 min', 'system', null],
-        ['Ingresar a sala virtual', 'Postor, máx. 15 min antes', 'person', 13],
-        ['Participar en remate', 'Postor', 'person', 14],
-        ['Registrar resultado', 'Postor o usuario autorizado', 'person', 15]
-    ];
-    const node = (number, title, subtitle, type, checkNumber = number) => {
-        const isAutomatic = checkNumber === null;
-        const isResultTask = number === 16;
-        const done = isResultTask
-            ? branchComplete
-            : isAutomatic ? completed >= 12 : completed >= checkNumber;
-        const isCurrent = isResultTask
-            ? currentStage >= 15 && !branchComplete
-            : !isAutomatic && currentStage === checkNumber;
-        const isLate = isCurrent && item.status === 'ATRASADO';
-        const stateClass = done ? 'is-done' : isLate ? 'is-late' : isCurrent ? 'is-current' : 'is-pending';
-        const marker = done ? '✓' : isCurrent ? '!' : number;
-        const stateText = done ? isResultTask ? 'Workflow completado' : 'Completada' : isLate ? 'Atrasada' : isCurrent ? 'En proceso' : isAutomatic ? 'Automática' : 'Pendiente';
-        return `<article class="workflow-node ${type} ${stateClass}">
-            <span class="workflow-node-marker">${marker}</span>
-            <span class="workflow-node-content"><strong><span class="workflow-node-number">${number}.</span> ${title}</strong><small>${subtitle}</small></span>
-            <span class="workflow-node-state">${stateText}</span>
-        </article>`;
-    };
-    const downArrow = '<div class="workflow-down-arrow" aria-hidden="true"><span></span></div>';
-    const rightArrow = '<span class="workflow-right-arrow" aria-hidden="true">→</span>';
-    const regularNode = number => {
-        const [title, subtitle, type, checkNumber] = diagramTasks[number - 1];
-        const resultSubtitle = number === 16 && selectedOutcome
-            ? `Resultado: ${activeBranch.title}`
-            : subtitle;
-        return node(number, title, resultSubtitle, type, checkNumber);
-    };
-    const resultBranch = (key, branch) => {
-        const isSelected = selectedOutcome === key;
-        const canSelect = currentStage >= 15;
-        const tasks = isSelected
-            ? `<div class="workflow-result-tasks">${branch.tasks.map(([taskId, title, subtitle], index) => {
-                const isDone = Boolean(outcomeTasks[taskId]);
-                const isCurrent = !isDone && branch.tasks.slice(0, index).every(([previousId]) => outcomeTasks[previousId]);
-                const marker = isDone ? '✓' : isCurrent ? '!' : '○';
-                const taskState = isDone ? 'done' : isCurrent ? item.status === 'ATRASADO' ? 'late' : 'current' : 'pending';
-                return `<label class="workflow-result-task ${taskState}">
-                    <input type="checkbox" ${isDone ? 'checked' : ''} onchange="toggleResultTask(${item.id}, '${key}', '${taskId}', this.checked)">
-                    <span class="workflow-result-task-marker">${marker}</span>
-                    <span class="workflow-result-task-copy"><strong>${taskId}. ${title}</strong><small>${subtitle}</small></span>
-                </label>${index < branch.tasks.length - 1 ? rightArrow : ''}`;
-            }).join('')}${branchComplete ? '<p class="workflow-branch-finished">✓ Fin del workflow</p>' : ''}</div>`
-            : '';
-        return `<section class="workflow-branch ${isSelected ? 'selected' : ''} ${canSelect ? '' : 'locked'}">
-            <button class="workflow-branch-select" type="button" aria-pressed="${isSelected}" ${canSelect ? '' : 'disabled'} onclick="selectWorkflowOutcome(${item.id}, '${key}')">
-                <strong>${branch.title}</strong><span>${branch.description}</span>
-            </button>
-            ${tasks}
-        </section>`;
-    };
-    return `
-        <header class="diagram-heading">
-            <h2 id="flowTitle">Diagrama del proceso</h2>
-            <p class="diagram-subtitle">Flujo completo desde la aceptación de la propiedad hasta el resultado del remate.</p>
-        </header>
-        <div class="diagram-scroll">
-            <div class="workflow-map">
-                <div class="workflow-flow-row workflow-row-one">
-                    ${[1, 2, 3, 4, 5, 6].map((number, index) => `${regularNode(number)}${index < 5 ? rightArrow : ''}`).join('')}
-                    ${rightArrow}
-                    <div class="workflow-parallel-mini">
-                        <span>Revisión legal en paralelo</span>
-                        ${regularNode(7)}
-                    </div>
-                </div>
-                ${downArrow}
-                <div class="workflow-flow-row workflow-row-two">
-                    ${[8, 9, 10].map(number => `${regularNode(number)}${rightArrow}`).join('')}
-                    <div class="workflow-parallel-mini">
-                        <span>Revisión legal en paralelo</span>
-                        <div>${regularNode(11)}${rightArrow}${regularNode(12)}</div>
-                    </div>
-                    ${rightArrow}
-                    ${[13, 14, 15].map((number, index) => `${regularNode(number)}${index < 2 ? rightArrow : ''}`).join('')}
-                </div>
-                ${downArrow}
-                <div class="workflow-flow-row workflow-row-three">${regularNode(16)}</div>
-                ${downArrow}
-                <section class="workflow-results">
-                    ${Object.entries(RESULT_BRANCHES).map(([key, branch]) => resultBranch(key, branch)).join('')}
-                </section>
-                <section class="workflow-exceptions">
-                    <h3>Estados excepcionales</h3>
-                    <div class="workflow-exception-list">
-                        <article><strong>CANCELADO</strong><span>Por legal, cierra el workflow.</span></article>
-                        <article><strong>SUSPENDIDO, DESIERTO U OTRO</strong><span>Rama por definir.</span></article>
-                    </div>
-                </section>
-                <footer class="workflow-legend" aria-label="Leyenda">
-                    <span class="system"><i></i>Sistema</span>
-                    <span class="person"><i></i>Persona</span>
-                    <span class="result"><i></i>Resultado o decisión</span>
-                    <span class="parallel"><i></i>Paralelo, no bloquea</span>
-                </footer>
-            </div>
-        </div>
-    `;
+function flowStopNotice(item) {
+    if (!isStopped(item)) return '';
+    const task = TASKS[getFlowStage(item) - 1] || 'Registrar resultado';
+    const text = item.status === 'SUSPENDIDO'
+        ? `Remate suspendido por legal en «${task}». Reanúdalo para continuar.`
+        : `Remate cancelado por legal en «${task}». El workflow está cerrado.`;
+    return `<p class="flow-stopped ${sc(item.status)}">${text}</p>`;
+}
+
+// Legal puede suspender o cancelar en cualquier paso; los botones abren la confirmación de workflow.js.
+function flowLegalActions(item) {
+    if (isFinished(item) || item.status === 'CANCELADO') return '';
+    const suspended = item.status === 'SUSPENDIDO';
+    return `<div class="flow-legal"><span>Revisión legal</span><button type="button" onclick="openNode(${item.id}, 'x:0')">${suspended ? 'Reanudar remate' : 'Suspender remate'}</button><button class="danger" type="button" onclick="openNode(${item.id}, 'x:1')">Cancelar remate</button></div>`;
 }
 
 function openFlow(id, view = 'list') {
@@ -318,13 +247,13 @@ function closeFlow() {
     flowModal.setAttribute('aria-hidden', 'true');
     document.body.classList.remove('flow-open');
 }
-function openDetail(id) { active = id; render(search.value); show(data[id - 1]); detailPanel.classList.add('open'); detailBackdrop.classList.add('open'); detailPanel.setAttribute('aria-hidden', 'false'); document.body.classList.add('detail-open') }
+function openDetail(id) { const item = data.find(x => x.id === id); if (!item) return; active = id; render(search.value); show(item); detailPanel.classList.add('open'); detailBackdrop.classList.add('open'); detailPanel.setAttribute('aria-hidden', 'false'); document.body.classList.add('detail-open') }
 function completeStage(id) {
     const item = data.find(x => x.id === Number(id));
     if (!item) return;
 
     const current = getFlowStage(item);
-    if (current > TASKS.length) return;
+    if (current > TASKS.length || isStopped(item)) return;
 
     const next = current + 1;
     const completed = next - 1;
@@ -353,9 +282,28 @@ function updateWorkflowItem(item, changes, message) {
     if (message) note(message);
 }
 
+// Suspender se puede revertir con resumeWorkflow; cancelar cierra el workflow.
+function stopWorkflow(id, kind) {
+    const item = data.find(x => x.id === Number(id));
+    if (!item || item.status === 'CANCELADO' || item.status === kind || isFinished(item)) return;
+    const suspended = kind === 'SUSPENDIDO';
+    updateWorkflowItem(item, {
+        status: kind,
+        stopPrior: item.stopPrior || { status: item.status, due: item.due },
+        due: suspended ? 'Suspendido por revisión legal' : 'Cancelado por revisión legal'
+    }, suspended ? 'Remate suspendido por legal' : 'Remate cancelado por legal');
+}
+
+function resumeWorkflow(id) {
+    const item = data.find(x => x.id === Number(id));
+    if (!item || item.status !== 'SUSPENDIDO') return;
+    const prior = item.stopPrior || { status: 'ALERTA', due: 'Plazo por recalcular' };
+    updateWorkflowItem(item, { ...prior, stopPrior: null }, 'Remate reanudado');
+}
+
 function selectWorkflowOutcome(id, outcome) {
     const item = data.find(x => x.id === Number(id));
-    if (!item || !RESULT_BRANCHES[outcome] || getFlowStage(item) < 15) return;
+    if (!item || !RESULT_BRANCHES[outcome] || getFlowStage(item) < 15 || isStopped(item)) return;
     if (item.resultOutcome === outcome) return;
 
     const priorStatus = item.resultPriorStatus || (item.status === 'ATRASADO' ? 'ATRASADO' : 'ALERTA');
@@ -376,7 +324,7 @@ function selectWorkflowOutcome(id, outcome) {
 function toggleResultTask(id, outcome, taskId, checked) {
     const item = data.find(x => x.id === Number(id));
     const branch = RESULT_BRANCHES[outcome];
-    if (!item || !branch || item.resultOutcome !== outcome || getFlowStage(item) < 15) return;
+    if (!item || !branch || item.resultOutcome !== outcome || getFlowStage(item) < 15 || isStopped(item)) return;
     if (!branch.tasks.some(([id]) => id === taskId)) return;
 
     const resultTasks = { ...(item.resultTasks || {}), [taskId]: Boolean(checked) };
@@ -397,7 +345,10 @@ function toggleResultTask(id, outcome, taskId, checked) {
 }
 
 function closeDetail() { detailPanel.classList.remove('open'); detailBackdrop.classList.remove('open'); detailPanel.setAttribute('aria-hidden', 'true'); document.body.classList.remove('detail-open') }
-function select(id) { if (innerWidth < 761) { location.href = 'detalle.html?id=' + id; return } openDetail(id) } function note(s) { toast.textContent = s; toast.classList.add('show'); clearTimeout(window.t); window.t = setTimeout(() => toast.classList.remove('show'), 2200) } search.oninput = e => render(e.target.value); document.querySelectorAll('[data-week]').forEach(b => b.onclick = () => { week += +b.dataset.week; weekLabel.textContent = week < 0 ? 'Semana del 6 al 10 oct 2025' : week > 0 ? 'Semana del 20 al 24 oct 2025' : 'Semana del 13 al 17 oct 2025'; note('Semana actualizada') }); document.querySelectorAll('.nav button').forEach(b => b.onclick = () => { document.querySelectorAll('.nav button').forEach(x => x.classList.remove('active')); b.classList.add('active'); note(b.textContent.trim() + ' · sección de maqueta') }); showAll.onclick = () => note('Mostrando los 7 remates');
+function select(id) { openDetail(id) } function note(s) { toast.textContent = s; toast.classList.add('show'); clearTimeout(window.t); window.t = setTimeout(() => toast.classList.remove('show'), 2200) } search.oninput = e => render(e.target.value); 
+document.querySelectorAll('[data-week]').forEach(b => b.onclick = () => { week = window.RematesData.setWeek(week + +b.dataset.week); render(search.value); });
+document.querySelectorAll('[data-filter]').forEach(b => b.onclick = () => { statusFilter = statusFilter === b.dataset.filter ? '' : b.dataset.filter; render(search.value); });
+showAll.onclick = () => { clearFilters(); note('Mostrando todos los remates de la semana'); };
 const detailPanel = document.querySelector('.detail');
 const flowModal = document.querySelector('#flowModal');
 const flowDialog = document.querySelector('.flow-dialog');
@@ -430,11 +381,7 @@ document.addEventListener('keydown', event => {
         else closeDetail();
     }
 });
-const destinations = { 'Calendario': 'semana.html', 'Documentos': 'documentos.html', 'Reportes': 'reportes.html' };
-document.querySelectorAll('.nav button').forEach(b => {
-    const target = destinations[b.textContent.trim()];
-    if (target) b.onclick = () => location.href = target;
-});
-const mobileButtons = document.querySelectorAll('.mobile-nav button');
-if (mobileButtons[1]) mobileButtons[1].onclick = () => location.href = 'semana.html';
 render();
+// Permite enlazar directo al detalle de un remate: hello.html?id=3
+const linkedId = Number(new URLSearchParams(location.search).get('id'));
+if (linkedId) openDetail(linkedId);

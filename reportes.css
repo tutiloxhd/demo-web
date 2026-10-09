@@ -1,0 +1,90 @@
+/* Panel de gerencia (reportes.js) */
+.rp-filters{display:flex;flex-wrap:wrap;align-items:center;gap:12px 18px;margin-bottom:14px}
+.rp-filters .screen-week{margin:0}
+.rp-actions{display:flex;gap:8px;margin-left:auto}
+.rp-period{display:none;margin:0 0 14px;font-size:15px;font-weight:700}
+.kpi-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:16px}
+.kpi{min-width:0;padding:16px 18px;border:1px solid var(--line);border-radius:13px;background:#fff}
+.kpi h3{margin:0;color:#607596;font-size:11.5px;font-weight:700;letter-spacing:.03em}
+.kpi-value{margin:8px 0 4px;font-size:30px;font-weight:800;line-height:1.1}
+.kpi small{color:#607596;font-size:12px}
+.dot{display:inline-block;width:8px;height:8px;margin-right:6px;border-radius:50%}
+.meter{height:6px;margin-top:9px;overflow:hidden;border-radius:99px;background:#e7edf5}
+.meter i{display:block;height:100%;border-radius:99px;background:var(--blue)}
+.report-card{min-width:0}
+.report-detail{grid-column:1/-1}
+.card-sub{margin:4px 0 14px;color:#7c8ca3;font-size:12px}
+.card-note{margin:10px 0 0;color:#7c8ca3;font-size:12px}
+
+/* Lista de pendientes */
+.issue{display:grid;grid-template-columns:96px minmax(0,1.3fr) minmax(0,1.3fr) minmax(0,.8fr);align-items:center;gap:14px;padding:11px 0;border-top:1px solid var(--line);color:var(--navy);font-size:12.5px;text-decoration:none}
+.issue:hover{background:#f6f9fe}
+.issue b{display:block;font-weight:700}
+.issue small{display:block;margin-top:2px;color:#7c8ca3;font-size:11.5px}
+.issue .status{min-width:0}
+
+/* Barras horizontales: un solo tono, valor al final */
+.hbar{display:grid;grid-template-columns:minmax(0,46%) minmax(0,1fr) 22px;align-items:center;gap:10px;min-height:32px;font-size:12.5px}
+.hbar-track{height:12px;border-left:1px solid #d5deea}
+.hbar-track i{display:block;height:100%;border-radius:0 4px 4px 0;background:var(--blue)}
+.hbar b{text-align:right}
+
+/* Barra apilada de estados y leyenda */
+.stack{display:flex;gap:2px;height:16px;margin-bottom:12px}
+.stack i{min-width:8px;border-radius:4px}
+.legend-row{display:flex;align-items:center;gap:8px;padding:7px 0;border-top:1px solid #eef2f7;font-size:12.5px}
+.legend-row i{width:10px;height:10px;border-radius:3px}
+.legend-row b{margin-left:auto}
+.hbar+.legend-row{margin-top:10px}
+
+/* Columnas por semana */
+.cols{display:flex;align-items:flex-end;gap:12px;height:160px}
+.col{display:flex;height:100%;min-width:0;flex:1;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px;padding:0;border:0;background:none;color:#607596;font:inherit;font-size:11px;cursor:pointer}
+.col b{color:var(--navy);font-size:13px}
+.col i{width:100%;max-width:24px;min-height:2px;border-radius:4px 4px 0 0;background:#c3cfdf;transition:background .15s ease}
+.col.current i,.col:hover i{background:var(--blue)}
+.col span{white-space:nowrap}
+
+/* Tabla de detalle */
+.rp-table-wrap{overflow-x:auto}
+.rp-table{width:100%;min-width:980px;border-collapse:collapse;font-size:12.5px}
+.rp-table th,.rp-table td{padding:10px 12px;border-bottom:1px solid var(--line);text-align:left;vertical-align:middle}
+.rp-table th{color:#607596;font-size:11.5px;font-weight:700;white-space:nowrap}
+.rp-table .num{text-align:right;font-variant-numeric:tabular-nums}
+.rp-table tbody tr{cursor:pointer}
+.rp-table tbody tr:hover{background:#f6f9fe}
+.rp-table .status{min-width:0}
+
+.viz-tip{position:fixed;z-index:80;max-width:260px;padding:7px 10px;border-radius:8px;background:var(--navy);color:#fff;font-size:12px;opacity:0;pointer-events:none;transform:translate(-50%,calc(-100% - 12px));transition:opacity .12s ease}
+.viz-tip.show{opacity:1}
+
+@media(max-width:900px){
+    .rp-actions{width:100%;margin-left:0}
+    .rp-actions .action-btn{flex:1}
+    .report-card.wide,.report-detail{grid-column:auto}
+}
+@media(max-width:600px){
+    .rp-filters .filters,.rp-filters .screen-week{width:100%}
+    .rp-filters .filter{flex:1}
+    .kpi-row{grid-template-columns:1fr 1fr;gap:10px}
+    .kpi{padding:13px 14px}
+    .kpi:first-child{grid-column:1/-1}
+    .kpi-value{font-size:24px}
+    .issue{grid-template-columns:minmax(0,1fr) auto;gap:6px 10px}
+    .issue .status{grid-area:1/2}
+    .issue span:nth-child(2){grid-area:1/1}
+    .issue span:nth-child(3){grid-area:2/1/auto/-1}
+    .issue span:nth-child(4){display:none}
+}
+
+/* Imprimir / PDF: solo el informe */
+@media print{
+    .side,.mobile-nav,.screen-top,.rp-filters,.toast,.viz-tip{display:none!important}
+    .screen-app{display:block}
+    .screen-content{max-width:none;padding:0}
+    .rp-period{display:block}
+    .report-card,.kpi{break-inside:avoid}
+    .rp-table{min-width:0;font-size:10px}
+    .rp-table th,.rp-table td{padding:5px 6px}
+    body,html{background:#fff}
+}

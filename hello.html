@@ -6,39 +6,18 @@
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>Remates · Inicio</title>
     <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="workflow.css">
 </head>
 
-<body>
+<body data-page="inicio">
     <div class="app">
-        <aside class="side">
-            <div class="brand"><svg class="icon">
-                    <use href="#home" />
-                </svg>Remates</div>
-            <nav class="nav"><button class="active"><svg class="icon">
-                        <use href="#home" />
-                    </svg>Inicio</button><button><svg class="icon">
-                        <use href="#hammer" />
-                    </svg>Remates</button><button><svg class="icon">
-                        <use href="#calendar" />
-                    </svg>Calendario</button><button disabled ><svg class="icon">
-                        <use href="#file" />
-                    </svg>Documentos</button><button disabled><svg class="icon">
-                        <use href="#chart" />
-                    </svg>Reportes</button>
-                <div class="rule"></div><button disabled><svg class="icon">
-                        <use href="#users" />
-                    </svg>Equipos</button><button disabled><svg class="icon">
-                        <use href="#settings" />
-                    </svg>Configuración</button>
-            </nav>
-            <div class="version">Maqueta navegable · v1.0</div>
-        </aside>
+        <div data-side></div>
         <main class="main">
             <header class="top">
                 <div class="week"><button class="sq" data-week="-1">‹</button><span id="weekLabel">Semana del 13 al 17
                         oct 2025</span><button class="sq" data-week="1">›</button></div>
                 <div class="actions"><label class="search"><svg class="icon">
-                            <use href="#search" />
+                            <use href="#icon-search" />
                         </svg><input id="search" placeholder="Buscar remate, dirección o responsable…"></label><span
                         class="bell"><svg class="icon">
                             <use href="#bell" />
@@ -50,30 +29,35 @@
             </header>
             <section class="content">
                 <div class="metrics">
-                    <div class="metric blue">
+                    <button class="metric blue" type="button" data-filter="">
                         <div><b id="metricTotal">0</b><span>Remates</span></div><svg class="icon">
                             <use href="#home" />
                         </svg>
-                    </div>
-                    <div class="metric amber">
+                    </button>
+                    <button class="metric amber" type="button" data-filter="ALERTA">
                         <div><b id="metricAlert">0</b><span>En alerta</span></div><svg class="icon">
                             <use href="#alert" />
                         </svg>
-                    </div>
-                    <div class="metric red">
+                    </button>
+                    <button class="metric red" type="button" data-filter="ATRASADO">
                         <div><b id="metricLate">0</b><span>Atrasado</span></div><svg class="icon">
                             <use href="#clock" />
                         </svg>
-                    </div>
-                    <div class="metric green">
+                    </button>
+                    <button class="metric green" type="button" data-filter="BIEN">
                         <div><b id="metricGood">0</b><span>Bien</span></div><svg class="icon">
                             <use href="#check" />
                         </svg>
-                    </div>
+                    </button>
+                    <button class="metric slate" type="button" data-filter="DETENIDO">
+                        <div><b id="metricStopped">0</b><span>Detenidos</span></div><svg class="icon">
+                            <use href="#pause" />
+                        </svg>
+                    </button>
                 </div>
                 <section class="card">
                     <div class="card-head">
-                        <h2>Remates de la semana</h2><button class="week-pick" id="showAll"><svg class="icon"
+                        <h2>Remates de la semana <small id="listCount"></small></h2><button class="week-pick" id="showAll"><svg class="icon"
                                 style="width:16px;vertical-align:middle">
                                 <use href="#calendar" />
                             </svg> <span>Semana del 13 al 17 oct 2025</span>⌄</button>
@@ -98,73 +82,24 @@
     </div>
     <div class="flow-modal" id="flowModal" aria-hidden="true">
         <section class="flow-dialog" role="dialog" aria-modal="true" aria-labelledby="flowTitle">
-            <button class="flow-view-toggle" id="flowViewToggle" type="button" aria-label="Ver diagrama del proceso" title="Ver diagrama del proceso">↗</button>
+            <button class="flow-view-toggle" id="flowViewToggle" type="button" aria-label="Ver diagrama del proceso"
+                title="Ver diagrama del proceso">↗</button>
             <button class="flow-close" id="flowClose" type="button" aria-label="Cerrar flujo">×</button>
             <div id="flowContent"></div>
         </section>
     </div>
-    <nav class="mobile-nav"><button class="active"><svg class="icon">
-                <use href="#home" />
-            </svg>Remates</button><button onclick="note('Vista semanal: próxima maqueta')"><svg class="icon">
-                <use href="#calendar" />
-            </svg>Semana</button><button onclick="note('Menú: próxima maqueta')"><svg class="icon">
-                <use href="#more" />
-            </svg>Más</button></nav>
+    <div class="node-modal" id="nodeModal" aria-hidden="true">
+        <section class="node-dialog" role="dialog" aria-modal="true" aria-labelledby="nodeTitle">
+            <button class="flow-close" id="nodeClose" type="button" aria-label="Cerrar paso">×</button>
+            <div id="nodeContent"></div>
+        </section>
+    </div>
+    <div data-mobile-nav></div>
     <div class="toast" id="toast"></div>
-    <svg width="0" height="0" style="position:absolute">
-        <defs>
-            <symbol id="home" viewBox="0 0 24 24">
-                <path d="M3 11 12 3l9 8v9H15v-7H9v7H3z" />
-            </symbol>
-            <symbol id="calendar" viewBox="0 0 24 24">
-                <rect x="3" y="5" width="18" height="16" rx="2" />
-                <path d="M8 3v4M16 3v4M3 10h18" />
-            </symbol>
-            <symbol id="search" viewBox="0 0 24 24">
-                <circle cx="11" cy="11" r="7" />
-                <path d="m20 20-4-4" />
-            </symbol>
-            <symbol id="bell" viewBox="0 0 24 24">
-                <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4" />
-            </symbol>
-            <symbol id="alert" viewBox="0 0 24 24">
-                <path d="M12 3 2 21h20zM12 9v5M12 18h.01" />
-            </symbol>
-            <symbol id="clock" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="9" />
-                <path d="M12 7v6l4 2" />
-            </symbol>
-            <symbol id="check" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="9" />
-                <path d="m8 12 3 3 5-6" />
-            </symbol>
-            <symbol id="file" viewBox="0 0 24 24">
-                <path d="M6 3h8l4 4v14H6zM14 3v5h5M9 13h6M9 17h6" />
-            </symbol>
-            <symbol id="users" viewBox="0 0 24 24">
-                <circle cx="9" cy="8" r="3" />
-                <path d="M3 21v-2a6 6 0 0 1 12 0v2M16 5a3 3 0 0 1 0 6M18 14a5 5 0 0 1 3 5" />
-            </symbol>
-            <symbol id="settings" viewBox="0 0 24 24">
-                <circle cx="12" cy="12" r="3" />
-                <path
-                    d="M19 13v-3l2-1-2-4-2 1-3-2-1-2H9L8 4 6 6 4 5 2 9l2 1v3l-2 2 2 4 2-1 2 2 1 2h4l1-2 3-2 2 1 2-4z" />
-            </symbol>
-            <symbol id="hammer" viewBox="0 0 24 24">
-                <path d="m14 5 5 5M12 7l5 5M3 21l9-9M5 7l4-4 8 8-4 4z" />
-            </symbol>
-            <symbol id="chart" viewBox="0 0 24 24">
-                <path d="M4 20V10M9 20V5M14 20v-8M19 20V3M2 20h20" />
-            </symbol>
-            <symbol id="more" viewBox="0 0 24 24">
-                <circle cx="5" cy="12" r="1" fill="currentColor" />
-                <circle cx="12" cy="12" r="1" fill="currentColor" />
-                <circle cx="19" cy="12" r="1" fill="currentColor" />
-            </symbol>
-        </defs>
-    </svg>
     <script src="data.js"></script>
+    <script src="shell.js"></script>
     <script src="app.js"></script>
+    <script src="workflow.js"></script>
 </body>
 
 </html>
