@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Mis tareas · InmoRemates</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="mis-tareas.css">
+</head>
+
+<body data-page="mis-tareas">
+    <div class="tasks-page-shell">
+        <div data-side></div>
+        <main class="tasks-main">
+            <header class="tasks-topbar">
+                <div>
+                    <h1>Mis tareas</h1>
+                    <p>Permite revisar y gestionar las tareas asignadas al usuario.</p>
+                </div>
+                <div class="tasks-header-tools">
+                    <label class="tasks-search" aria-label="Buscar tareas">
+                        <svg class="icon"><use href="#icon-search" /></svg>
+                        <input id="taskSearch" type="search" placeholder="Buscar tareas, propiedades o remates">
+                    </label>
+                    <button class="tasks-bell" type="button" aria-label="Notificaciones">
+                        <svg class="icon"><use href="#bell" /></svg>
+                        <span class="badge">3</span>
+                    </button>
+                    <label class="tasks-user-switcher" aria-label="Seleccionar usuario de prueba">
+                        <span>Usuario</span>
+                        <select id="activeUserSelect"></select>
+                    </label>
+                </div>
+            </header>
+
+            <div class="tasks-shell">
+                <section class="tasks-content">
+                    <div id="tasksMetrics" class="tasks-metrics"></div>
+
+                    <div class="tasks-toolbar">
+                        <div id="quickFilters" class="tasks-quick-filters" aria-label="Filtros rápidos"></div>
+                        <div class="tasks-filter-selects">
+                            <select id="taskStatusFilter">
+                                <option value="all">Estado: todos</option>
+                            </select>
+                            <select id="taskTypeFilter">
+                                <option value="all">Tipo: todos</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div id="taskGroups" class="tasks-groups"></div>
+                </section>
+
+                <aside class="tasks-aside">
+                    <div class="tasks-panel">
+                        <h3>Próximos vencimientos</h3>
+                        <div id="upcomingList" class="tasks-list-small"></div>
+                    </div>
+                    <div class="tasks-panel workload-panel">
+                        <h3>Mi carga de trabajo</h3>
+                        <div id="workloadSummary"></div>
+                    </div>
+                </aside>
+            </div>
+        </main>
+    </div>
+
+    <div id="taskModal" class="task-modal hidden" aria-hidden="true">
+        <div class="task-modal-backdrop" data-close-task-modal="true"></div>
+        <section class="task-modal-dialog" role="dialog" aria-modal="true">
+            <button type="button" class="task-modal-close" data-close-task-modal="true" aria-label="Cerrar modal">×</button>
+            <div id="taskModalContent"></div>
+        </section>
+    </div>
+
+    <div data-mobile-nav></div>
+    <div class="toast" id="tasksToast"></div>
+
+    <script src="data.js"></script>
+    <script src="shell.js"></script>
+    <script src="mis-tareas.js"></script>
+</body>
+
+</html>

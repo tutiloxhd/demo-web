@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Gestor de usuarios · InmoRemates</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="gestor-usuarios.css">
+</head>
+
+<body data-page="usuarios">
+    <div class="users-page-shell">
+        <div data-side></div>
+        <main class="users-main">
+            <header class="users-topbar">
+                <div>
+                    <h1>Gestor de usuarios</h1>
+                    <p>Administra los usuarios ficticios y sus asignaciones para distribuir la carga de trabajo.</p>
+                </div>
+                <button id="newUserButton" class="primary-user-button" type="button">+ Nuevo usuario</button>
+            </header>
+
+            <div class="users-toolbar">
+                <label class="users-search">
+                    <svg class="icon"><use href="#icon-search" /></svg>
+                    <input id="userSearch" type="search" placeholder="Buscar usuario, rol o equipo">
+                </label>
+                <div class="users-filters">
+                    <select id="userRoleFilter">
+                        <option value="all">Rol: todos</option>
+                    </select>
+                    <select id="userStatusFilter">
+                        <option value="all">Estado: todos</option>
+                        <option value="active">Activos</option>
+                        <option value="inactive">Inactivos</option>
+                    </select>
+                </div>
+            </div>
+
+            <section class="users-panel">
+                <div id="usersTableWrap" class="users-table-wrap"></div>
+            </section>
+        </main>
+    </div>
+
+    <div id="userModal" class="user-modal hidden" aria-hidden="true">
+        <div class="user-modal-backdrop" data-close-user-modal="true"></div>
+        <section class="user-modal-dialog" role="dialog" aria-modal="true">
+            <button type="button" class="user-modal-close" data-close-user-modal="true" aria-label="Cerrar modal">×</button>
+            <div id="userModalContent"></div>
+        </section>
+    </div>
+
+    <div data-mobile-nav></div>
+    <div class="toast" id="usersToast"></div>
+
+    <script src="data.js"></script>
+    <script src="shell.js"></script>
+    <script src="gestor-usuarios.js"></script>
+</body>
+
+</html>
