@@ -47,7 +47,7 @@
   // Usa el mismo criterio de estado que Mis tareas (T.taskState), para que los números coincidan.
   function getTaskSummary(userId) {
     return state.tasks.reduce((summary, task) => {
-      if (task.assignedUserId !== userId) return summary;
+      if (!T.isAssignedTo(task, userId)) return summary;
       const status = T.taskState(task);
       summary.total += 1;
       if (status !== 'completed') summary.open += 1;
@@ -212,18 +212,19 @@
   function openUserView(userId) {
     const user = state.users.find(item => item.id === userId);
     if (!user) return;
-    const tasks = state.tasks.filter(task => task.assignedUserId === userId);
+    const tasks = state.tasks.filter(task => T.isAssignedTo(task, userId));
+    const roleIn = task => task.assignedUserId === userId ? 'responsible' : 'substitute';
     // El usuario actual siempre aparece en la lista, aunque esté inactivo, para que el selector muestre el valor real.
     const assignable = state.users.filter(u => u.active || u.id === user.id);
     const detail = tasks.length ? tasks.map(task => `
       <li style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;">
         <div>
           <strong>${escapeHtml(task.title)}</strong><br>
-          <span>${escapeHtml(task.propertyTitle)} · ${T.STATUS_LABEL[task.status]}</span>
+          <span>${escapeHtml(task.propertyTitle)} · ${T.STATUS_LABEL[task.status]} · ${roleIn(task) === 'substitute' ? 'Suplente' : 'Responsable'}</span>
         </div>
         ${task.status === 'completed' ? '' : `<label style="display:flex;align-items:center;gap:6px;">
           <span style="font-size:12px;color:var(--users-muted);">Reasignar</span>
-          <select data-reassign-task="${escapeHtml(task.id)}">
+          <select data-reassign-task="${escapeHtml(task.id)}" data-assignee-role="${roleIn(task)}">
             ${assignable.map(u => `<option value="${escapeHtml(u.id)}" ${u.id === user.id ? 'selected' : ''}>${escapeHtml(u.name)}</option>`).join('')}
           </select>
         </label>`}
@@ -253,7 +254,7 @@
       select.addEventListener('change', e => {
         const task = state.tasks.find(item => item.id === e.target.dataset.reassignTask);
         if (!task) return;
-        T.saveNote(task, { assignedUserId: e.target.value });
+        T.saveNote(task, e.target.dataset.assigneeRole === 'substitute' ? { substituteUserId: e.target.value } : { assignedUserId: e.target.value });
         notify('Tarea reasignada correctamente');
         render();
         closeUserModal();

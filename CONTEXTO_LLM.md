@@ -63,7 +63,7 @@ Campos de cada remate:
 - `person`, `avatarUrl` y `responsibleId`: **no se escriben en los datos**. Los calcula `data.js` a partir del responsable de la tarea actual y los recalcula en cada `update` y al guardar usuarios.
 - `minimum` (mínimo del remate, en millones de pesos) y `awarded` si se adjudicó
 - `documents` (`[nombre, tipo, estado]`) y `photo` (id de Unsplash)
-- Solo cuando aplican: `resultOutcome`, `resultTasks`, `resultPriorStatus`, `stopPrior` y `taskNotes` (ajustes por tarea: `{ [clave]: { status, assignedUserId, description, valeVistaRequest } }`)
+- Solo cuando aplican: `resultOutcome`, `resultTasks`, `resultPriorStatus`, `stopPrior` y `taskNotes` (ajustes por tarea: `{ [clave]: { status, assignedUserId, substituteUserId, description, valeVistaRequest } }`)
 
 `stage`, `flowStage` y `progress` deben ser coherentes entre sí: `stage` es el nombre de la tarea `flowStage` en `TASKS` y `progress` es el porcentaje de tareas completadas.
 
@@ -191,6 +191,7 @@ No existe una lista de tareas guardada. `TareasData.tasks()` las arma en cada re
 - **Prioridad:** crítica si el remate está atrasado, urgente si está en alerta, próxima si el remate es de esta semana, normal en otro caso.
 - **Plazo:** fecha y hora de `dueAt` del remate, con el tiempo relativo al «hoy» de la maqueta («Hace 4 horas», «En 2 días»). Si el remate no tiene `dueAt`, se muestra su texto `due` y se usa la fecha del remate. Con esa fecha se calculan «hoy» y «esta semana».
 - **«Hoy» de la maqueta:** fijo en el 16 de octubre de 2025 a las 18:00 (`NOW` y `TODAY` en `tareas-data.js`). «Esta semana» es la de ese día, de lunes a domingo.
+- **Suplente:** cada tarea puede tener uno. Es el elegido a mano en la tarea (`taskNotes[clave].substituteUserId`) o, si no, el suplente del gestor o postor del remate (`gestorBackupId`, `postorBackupId`). Una tarea es de un usuario si es su responsable o su suplente (`TareasData.isAssignedTo`): así se filtra Mis tareas y así cuenta el Gestor.
 - **Tipo, prioridad y plazo no se editan** en la tarea: salen del remate. Lo propio de la tarea (en curso o bloqueada, responsable, descripción, carta Vale Vista) se guarda en `taskNotes` del remate con `TareasData.saveNote`.
 
 Lo que cada acción produce:
@@ -198,18 +199,18 @@ Lo que cada acción produce:
 - **Completar una tarea** (casilla o estado «Completada») llama a `completeCurrent`: el remate avanza al paso siguiente y la tarea nueva le aparece a quien corresponda. Las completadas quedan de solo lectura.
 - **Avanzar el remate desde el tablero** cambia las tareas de la misma forma, porque usa las mismas transiciones.
 - **«Asignar gestor y postor»** (paso 2) guarda `gestorId` y `postorId` en el remate; desde ahí se reparten sus tareas. Solo ofrece usuarios del rol correspondiente y avisa si el postor ya tiene otro remate a la misma hora.
-- **Reasignar** una tarea, desde su modal o desde el Gestor, cambia también el responsable que muestra el tablero.
-- **Elegir el resultado** del remate no se hace en Mis tareas: la tarea «Elegir resultado del remate» lleva al flujo con «Ver remate».
+- **Reasignar** una tarea, desde su modal, su menú o el Gestor, cambia también el responsable que muestra el tablero. En el Gestor, si el usuario figura como suplente, lo que se reasigna es la suplencia.
+- **Elegir el resultado** del remate no se hace en Mis tareas: al abrir la tarea «Elegir resultado del remate» se muestra un aviso con el enlace «Abrir remate en Workflow».
 - **Desactivar un usuario** pide confirmación en un modal propio. Las tareas de los remates donde es gestor o postor quedan a su nombre hasta reasignarlas; las que dependen solo del rol pasan a otro usuario activo.
 
 Pantalla de Mis tareas (rediseñada según una imagen de referencia del cliente):
 
 - **Métricas:** activas, atrasadas, vencen hoy y esta semana; filtran al tocarlas. Una tarea atrasada no cuenta como «vence hoy».
-- **Grupos:** cada uno con su color e ícono, y se contraen (`state.collapsed`; «completadas» parte contraído).
-- **Fila:** plazo con texto relativo, responsable, tipo con ícono y una sola etiqueta (`taskPill`): el estado cuando informa algo (atrasada, bloqueada, en curso, completada) y, si no, la prioridad.
+- **Grupos:** atrasadas, críticas, próximas / hoy, de esta semana, posteriores, sin vencimiento y completadas. Cada uno con su color e ícono, ordenado por plazo, y se contraen (`state.collapsed`; «completadas» parte contraído).
+- **Fila:** el nombre del remate enlaza a su detalle; plazo con texto relativo, responsable (o su suplente), tipo con ícono y una sola etiqueta (`taskPill`): el estado cuando informa algo (atrasada, bloqueada, en curso, completada) y, si no, la prioridad.
 - **Menú «⋯»** (`openTaskMenu`): Reasignar, Marcar en curso o pendiente, Bloquear o desbloquear y Ver remate. Si el bloqueo viene de un remate suspendido, no se ofrece cambiarlo desde la tarea.
-- **Próximos vencimientos:** línea de tiempo con las cinco tareas abiertas más próximas; «Ver todas» limpia los filtros.
-- **Mi carga de trabajo:** dona por urgencia, con cada tarea en una sola categoría (atrasadas, vencen hoy, resto de la semana, próximas, completadas) y selector «Todas / Esta semana».
+- **Próximos vencimientos:** línea de tiempo con las cinco tareas abiertas que todavía no vencen; «Ver todas» y «Restablecer» limpian todos los filtros.
+- **Mi carga de trabajo:** dona por urgencia, con cada tarea en una sola categoría (atrasadas, vencen hoy, resto de la semana, próximas, completadas) y selector «Todas / Esta semana». Debajo, el desglose «Por estado».
 - **Tipos de tareas:** barras por tipo. Los tipos son los del workflow (Gestión, Vale Vista, Documentación, Legal, Participación, Cierre), no los de la referencia.
 
 Otros puntos:
@@ -281,8 +282,7 @@ Lo que se construyó, en orden, partiendo de un tablero con siete remates y un d
     - los pasos del workflow, sus transiciones y los usuarios pasaron a \`data.js\` como fuente única;
     - las tareas de Mis tareas se generan desde el workflow y completarlas avanza el remate;
     - el responsable de cada remate es el usuario al que le toca su tarea actual, y los remates tienen gestor y postor asignados;
-    - desactivar un usuario usa un modal propio.
-12. Rediseño de Mis tareas según la referencia del cliente (grupos de color contraíbles, fila con plazo relativo y una etiqueta, menú «⋯», línea de tiempo, dona y tipos), campo `dueAt` en los remates, y barra lateral oscura con la marca InmoRemates en toda la app.`
+    - desactivar un usuario usa un modal propio.m=>m+"\n13. Fusión con la rama de Cat-1114 (commit «agregue algunas cosas»), que había seguido trabajando sobre la lista de tareas guardada. Se mantuvo la versión conectada con el workflow y se trajeron sus aportes: suplentes por tarea, enlace al remate en cada fila, «Restablecer» sobre todos los filtros, búsqueda por etapa y prioridad, grupos «posteriores» y «sin vencimiento» ordenados por plazo, próximos vencimientos solo con tareas vigentes, desglose por estado y el aviso para tareas que se gestionan desde el flujo. No se conservó `mis-tareas-data.js` (la lista fija de tareas), porque las tareas ahora se generan desde los remates."
 
 Pendientes conversados y no hechos:
 

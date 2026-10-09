@@ -85,8 +85,13 @@
   function filterTasks(tasks) {
     const search = state.search.trim().toLowerCase();
     return tasks.filter(task => {
+      const property = getRelatedProperty(task);
       const user = getUserById(task.assignedUserId);
-      const haystack = [task.title, task.propertyTitle, task.propertyPlace, user.name, task.type, statusMeta[task.status]?.label].join(' ').toLowerCase();
+      const substitute = task.substituteUserId ? getUserById(task.substituteUserId) : { name: '' };
+      const haystack = [
+        task.title, task.propertyTitle, task.propertyPlace, property?.stage, user.name, substitute.name,
+        task.type, statusMeta[task.status]?.label, priorityMeta[task.priority]?.label
+      ].join(' ').toLowerCase();
       const matchesSearch = !search || haystack.includes(search);
       const matchesQuick = state.quickFilter === 'all' || filterByQuick(task, state.quickFilter);
       const matchesStatus = state.statusFilter === 'all' || task.status === state.statusFilter;
@@ -146,15 +151,18 @@
     const groups = [
       { key: 'late', icon: 'alert', title: 'Tareas atrasadas', predicate: task => task.status === 'late' },
       { key: 'critical', icon: 'flame', title: 'Tareas críticas', predicate: task => task.priority === 'critical' && task.status !== 'completed' },
-      { key: 'today', icon: 'clock', title: 'Tareas de hoy', predicate: dueToday },
+      { key: 'today', icon: 'clock', title: 'Tareas próximas / Hoy', predicate: dueToday },
       { key: 'week', icon: 'calendar', title: 'Tareas de esta semana', predicate: dueThisWeek },
-      { key: 'later', icon: 'flag', title: 'Tareas próximas', predicate: task => task.status !== 'completed' },
+      { key: 'later', icon: 'flag', title: 'Tareas posteriores', predicate: task => task.status !== 'completed' && Boolean(task.dueAt) },
+      { key: 'unscheduled', icon: 'pause', title: 'Tareas sin vencimiento', predicate: task => task.status !== 'completed' },
       { key: 'completed', icon: 'check', title: 'Tareas completadas', predicate: task => task.status === 'completed' }
     ];
     const placed = new Set();
 
     const html = groups.map(group => {
-      const items = tasks.filter(task => !placed.has(task.id) && group.predicate(task));
+      const items = tasks
+        .filter(task => !placed.has(task.id) && group.predicate(task))
+        .sort((a, b) => (a.dueAt || '9999').localeCompare(b.dueAt || '9999'));
       if (!items.length) return '';
       items.forEach(task => placed.add(task.id));
       const collapsed = state.collapsed.has(group.key);
@@ -207,12 +215,13 @@
     const user = getUserById(task.assignedUserId);
     const pill = taskPill(task);
     const relative = relativeDue(task);
+    const substitute = task.substituteUserId ? getUserById(task.substituteUserId) : null;
     return `
       <div class="task-item">
         <input class="task-checkbox" type="checkbox" data-task-check="${task.id}" ${task.status === 'completed' ? 'checked disabled' : ''}>
         <div class="task-main">
           <span class="task-title">${escapeHtml(task.title)}</span>
-          <span class="task-property">${escapeHtml(task.propertyTitle)} · ${escapeHtml(task.propertyPlace)}</span>
+          <span class="task-property"><a class="task-property-link" href="hello.html?id=${task.propertyId}">${escapeHtml(task.propertyTitle)}</a> · ${escapeHtml(task.propertyPlace)}</span>
         </div>
         <div class="task-due ${dueUrgency(task)}">
           <span class="task-due-date">${svgIcon('calendar')}${task.dueAt ? formatDate(task.dueDate, task.dueTime) : escapeHtml(task.dueText)}</span>
@@ -220,7 +229,7 @@
         </div>
         <div class="task-who">
           ${svgIcon('users')}
-          <span><b>${escapeHtml(user.name)}</b><small>Responsable</small></span>
+          <span><b>${escapeHtml(user.name)}</b><small>${substitute ? `Suplente: ${escapeHtml(substitute.name)}` : 'Responsable'}</small></span>
         </div>
         <div class="task-type">${svgIcon(TYPE_ICON[task.type] || 'file')}${escapeHtml(task.type)}</div>
         <div class="${pill.className} task-pill">${pill.label}</div>
@@ -240,11 +249,11 @@
     return `${day}, ${task.dueTime}`;
   }
 
-  // Línea de tiempo con las próximas tareas abiertas del usuario, de la más urgente a la más lejana.
+  // Línea de tiempo con las tareas abiertas del usuario que todavía no vencen, de la más próxima a la más lejana.
   function renderUpcoming() {
     const items = state.tasks
-      .filter(task => task.assignedUserId === state.activeUserId && task.status !== 'completed')
-      .sort((a, b) => (a.dueAt || '9999').localeCompare(b.dueAt || '9999'))
+      .filter(task => T.isAssignedTo(task, state.activeUserId) && task.status !== 'completed' && task.dueAt && new Date(task.dueAt) >= T.NOW)
+      .sort((a, b) => a.dueAt.localeCompare(b.dueAt))
       .slice(0, 5);
 
     if (!items.length) {
@@ -269,7 +278,7 @@
 
   // Dona con la carga del usuario por urgencia; cada tarea cae en una sola categoría.
   function renderWorkload() {
-    const mine = state.tasks.filter(task => task.assignedUserId === state.activeUserId);
+    const mine = state.tasks.filter(task => T.isAssignedTo(task, state.activeUserId));
     const tasks = state.workloadPeriod === 'week' ? mine.filter(T.inThisWeek) : mine;
     const open = task => task.status !== 'completed';
     const buckets = [
@@ -309,6 +318,25 @@
         </div>
       </div>
     `;
+    const statusRows = [
+      { label: 'Pendientes', key: 'pending', color: '#1268f3' },
+      { label: 'En curso', key: 'in_progress', color: '#6b43d6' },
+      { label: 'Atrasadas', key: 'late', color: '#ef1d2d' },
+      { label: 'Bloqueadas', key: 'blocked', color: '#57657d' },
+      { label: 'Completadas', key: 'completed', color: '#16a559' }
+    ].map(row => ({ ...row, value: tasks.filter(task => task.status === row.key).length }));
+    els.workloadSummary.insertAdjacentHTML('beforeend', `
+      <div class="workload-bars">
+        <h4 class="workload-subheading">Por estado</h4>
+        ${statusRows.map(row => `
+          <div class="workload-row">
+            <span>${row.label}</span>
+            <div class="bar-track"><span class="bar-fill" style="width:${row.value / (total || 1) * 100}%;background:${row.color};"></span></div>
+            <strong>${row.value}</strong>
+          </div>
+        `).join('')}
+      </div>
+    `);
     document.getElementById('workloadPeriod').onchange = e => {
       state.workloadPeriod = e.target.value;
       renderWorkload();
@@ -441,7 +469,12 @@
     ];
     els.quickFilters.innerHTML = quick.map(filter => `
       <button type="button" class="task-quick-filter ${state.quickFilter === filter.key ? 'active' : ''}" data-quick="${filter.key}">${filter.label}</button>
-    `).join('') + '<button type="button" class="task-quick-filter clear" data-quick="all">Restablecer</button>';
+    `).join('') + '<button type="button" class="task-quick-filter clear" data-reset-filters="true">Restablecer</button>';
+
+    els.quickFilters.querySelector('[data-reset-filters]').addEventListener('click', () => {
+      Object.assign(state, { quickFilter: 'all', statusFilter: 'all', typeFilter: 'all', search: '' });
+      render();
+    });
 
     els.quickFilters.querySelectorAll('[data-quick]').forEach(button => {
       button.addEventListener('click', () => {
@@ -461,7 +494,7 @@
 
   // Incluye a los usuarios inactivos que todavía tienen tareas abiertas, para que no queden inaccesibles.
   function renderUserSelect() {
-    const hasOpenTasks = user => state.tasks.some(task => task.assignedUserId === user.id && task.status !== 'completed');
+    const hasOpenTasks = user => state.tasks.some(task => T.isAssignedTo(task, user.id) && task.status !== 'completed');
     const selectable = state.users.filter(user => user.active || hasOpenTasks(user));
     if (!selectable.some(user => user.id === state.activeUserId) && selectable[0]) {
       state.activeUserId = selectable[0].id;
@@ -478,7 +511,7 @@
   function render() {
     state.tasks = T.tasks();
     const normalizedTasks = state.tasks;
-    const userTasks = normalizedTasks.filter(task => task.assignedUserId === state.activeUserId);
+    const userTasks = normalizedTasks.filter(task => T.isAssignedTo(task, state.activeUserId));
     const filtered = filterTasks(userTasks);
     renderUserSelect();
     renderFilters();
@@ -528,6 +561,10 @@
   function openTaskModal(taskId) {
     const task = state.tasks.find(item => item.id === taskId);
     if (!task) return;
+    if (task.needsBoard) {
+      openWorkflowTaskNotice(task);
+      return;
+    }
     if (task.step === 3) {
       openValeVistaModal(task);
       return;
@@ -600,6 +637,14 @@
           </div>
 
           <label>
+            Suplente (opcional)
+            <select name="substituteUserId" ${locked}>
+              <option value="">Sin suplente</option>
+              ${state.users.filter(item => item.active || item.id === task.substituteUserId).map(item => `<option value="${escapeHtml(item.id)}" ${item.id === task.substituteUserId ? 'selected' : ''}>${escapeHtml(item.name)}</option>`).join('')}
+            </select>
+          </label>
+
+          <label>
             Descripción
             <textarea name="description" ${locked}>${escapeHtml(task.description)}</textarea>
           </label>
@@ -627,6 +672,7 @@
       T.saveNote(task, {
         status: status === 'in_progress' || status === 'blocked' ? status : null,
         assignedUserId: formData.get('assignedUserId'),
+        substituteUserId: formData.get('substituteUserId') || '',
         description
       });
       if (status === 'completed') {
@@ -638,6 +684,29 @@
       render();
     });
 
+    showTaskModal();
+  }
+
+  // Tareas que no se resuelven aquí (elegir el resultado del remate): se explica y se enlaza al flujo.
+  function openWorkflowTaskNotice(task) {
+    els.taskModalContent.innerHTML = `
+      <div class="task-modal-body">
+        <header class="task-modal-header">
+          <div>
+            <h3>${escapeHtml(task.title)}</h3>
+            <span class="task-type">${escapeHtml(task.type)}</span>
+          </div>
+        </header>
+        ${renderPropertySummary(task)}
+        <div class="workflow-task-notice" role="status">
+          El resultado del remate se registra desde su flujo, donde se elige la rama y se ven sus dependencias. No se modifica desde Mis tareas.
+        </div>
+        <div class="task-modal-actions">
+          <a class="workflow-task-link" href="hello.html?id=${task.propertyId}">Abrir remate en Workflow</a>
+          <button type="button" class="secondary-action" data-close-task-modal="true">Cerrar</button>
+        </div>
+      </div>
+    `;
     showTaskModal();
   }
 

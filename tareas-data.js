@@ -12,6 +12,9 @@
   // base es la tarea del workflow (R.currentTask o R.lastDoneTask); note son los ajustes guardados para esa tarea.
   function buildTask(item, base, completed) {
     const note = (item.taskNotes || {})[base.key] || {};
+    // Suplente: el elegido a mano para la tarea o, si no, el suplente del gestor o postor del remate.
+    const backupId = note.substituteUserId ?? (base.role === 'gestor' ? item.gestorBackupId : base.role === 'postor' ? item.postorBackupId : '');
+    const substitute = R.users().find(user => user.id === backupId);
     const status = completed ? 'completed'
       : item.status === 'SUSPENDIDO' || note.status === 'blocked' ? 'blocked'
       : item.status === 'ATRASADO' ? 'late'
@@ -32,6 +35,7 @@
       description: note.description || base.desc,
       type: base.type,
       assignedUserId: R.taskUser(item, base).id,
+      substituteUserId: substitute ? substitute.id : '',
       // El plazo sale de dueAt del remate (fecha y hora de la tarea actual); sin él, de la fecha del remate.
       dueAt: completed ? null : item.dueAt || null,
       dueDate: !completed && item.dueAt ? item.dueAt.slice(0, 10) : item.iso,
@@ -79,6 +83,8 @@
     complete,
     saveNote,
     taskState: task => task.status,
+    // Una tarea es de un usuario si es su responsable o su suplente.
+    isAssignedTo: (task, userId) => task.assignedUserId === userId || task.substituteUserId === userId,
     inThisWeek
   };
 })();
