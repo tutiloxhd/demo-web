@@ -1,48 +1,6 @@
-const TASKS = [
-    'Crear workflow',
-    'Asignar gestor y postor',
-    'Generar carta Vale Vista',
-    'Enviar carta al GG',
-    'Enviar carta al banco',
-    'Generar formulario',
-    'Revisión legal pre-entrega',
-    'Retirar Vale Vista',
-    'Entregar Vale Vista + formulario',
-    'Registrar evidencia',
-    'Revisión legal final',
-    'Preparar participación',
-    'Ingresar a sala virtual',
-    'Participar en remate',
-    'Registrar resultado'
-];
-const RESULT_BRANCHES = {
-    ADJUDICADO: {
-        title: 'ADJUDICADO',
-        description: 'Ganamos el remate',
-        tasks: [
-            ['17A', 'Gestionar pago', 'Mecanismo por definir'],
-            ['18A', 'Marcar adjudicada', 'Usuario autorizado'],
-            ['19A', 'Crear proyecto', 'Sistema o usuario']
-        ]
-    },
-    NO_ADJUDICADO: {
-        title: 'NO ADJUDICADO',
-        description: 'Participamos, no ganamos',
-        tasks: [
-            ['17B', 'Recuperar garantía', 'Gestor, por confirmar'],
-            ['18B', 'Registrar garantía', 'Monto, banco, N° VV']
-        ]
-    },
-    REPROGRAMADO: {
-        title: 'REPROGRAMADO',
-        description: 'Nueva fecha de remate',
-        tasks: [
-            ['17C', 'Actualizar fecha', 'Queda en historial'],
-            ['17D', 'Recalcular plazos', 'Vencimientos y alertas'],
-            ['17E', 'Continuar workflow', 'Vuelve a la etapa vigente']
-        ]
-    }
-};
+// Los pasos, las ramas y sus transiciones viven en data.js, porque también los usa Mis tareas.
+const TASKS = window.RematesData.steps.map(step => step.title);
+const RESULT_BRANCHES = window.RematesData.branches;
 const data = window.RematesData.items.map(x => ({ ...x, avatar: x.avatarUrl }));
 let active = 0, week = window.RematesData.getWeek(), statusFilter = '', activeFlowView = 'list';
 const STATUS_CLASS = { ATRASADO: 'late', ALERTA: 'alert', SUSPENDIDO: 'paused', CANCELADO: 'cancelled' };
@@ -255,17 +213,8 @@ function completeStage(id) {
     const current = getFlowStage(item);
     if (current > TASKS.length || isStopped(item)) return;
 
-    const next = current + 1;
-    const completed = next - 1;
-    const reachedResult = next > TASKS.length;
-    const status = item.status === 'ATRASADO' ? 'ATRASADO' : 'ALERTA';
-    const changed = window.RematesData.update(id, {
-        flowStage: next,
-        status,
-        stage: reachedResult ? 'Registrar resultado' : TASKS[next - 1],
-        due: reachedResult ? 'Pendiente de completar resultado' : item.due,
-        progress: reachedResult ? 94 : Math.round(completed / TASKS.length * 100)
-    });
+    const reachedResult = current + 1 > TASKS.length;
+    const changed = window.RematesData.update(id, window.RematesData.stepChanges(item));
 
     Object.assign(item, changed, { avatar: changed.avatarUrl });
     render(search.value);
@@ -327,21 +276,9 @@ function toggleResultTask(id, outcome, taskId, checked) {
     if (!item || !branch || item.resultOutcome !== outcome || getFlowStage(item) < 15 || isStopped(item)) return;
     if (!branch.tasks.some(([id]) => id === taskId)) return;
 
-    const resultTasks = { ...(item.resultTasks || {}), [taskId]: Boolean(checked) };
-    const completed = branch.tasks.filter(([id]) => resultTasks[id]).length;
-    const branchComplete = completed === branch.tasks.length;
-    const progress = branchComplete ? 100 : 94 + Math.floor(completed / branch.tasks.length * 5);
-    const status = branchComplete
-        ? 'BIEN'
-        : item.status === 'ATRASADO' || item.resultPriorStatus === 'ATRASADO' ? 'ATRASADO' : 'ALERTA';
-
-    updateWorkflowItem(item, {
-        resultTasks,
-        status,
-        stage: branchComplete ? 'Workflow completado' : 'Registrar resultado',
-        due: branchComplete ? 'Workflow completado' : 'Pendiente de completar resultado',
-        progress
-    }, branchComplete ? 'Workflow completado' : '');
+    const changes = window.RematesData.resultTaskChanges(item, taskId, checked);
+    if (!changes) return;
+    updateWorkflowItem(item, changes, changes.progress === 100 ? 'Workflow completado' : '');
 }
 
 function closeDetail() { detailPanel.classList.remove('open'); detailBackdrop.classList.remove('open'); detailPanel.setAttribute('aria-hidden', 'true'); document.body.classList.remove('detail-open') }

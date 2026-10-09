@@ -1,43 +1,18 @@
 (function () {
-  const STORAGE_KEY = 'inmoremates-demo-tasks';
-  const USER_STORAGE_KEY = 'inmoremates-demo-users';
-  const DEFAULT_USERS = [
-    { id: 'u1', name: 'María González', email: 'maria.gonzalez@inmoremates.cl', role: 'Administrador', team: 'Dirección', active: true },
-    { id: 'u2', name: 'Juan Pérez', email: 'juan.perez@inmoremates.cl', role: 'Gestor de remates', team: 'Gestión', active: true },
-    { id: 'u3', name: 'Carla Rojas', email: 'carla.rojas@inmoremates.cl', role: 'Responsable de documentación', team: 'Documentación', active: true },
-    { id: 'u4', name: 'Diego Torres', email: 'diego.torres@inmoremates.cl', role: 'Responsable de participación', team: 'Participación', active: true },
-    { id: 'u5', name: 'Paula Díaz', email: 'paula.diaz@inmoremates.cl', role: 'Responsable de revisión legal', team: 'Legal', active: false }
-  ];
-
-  const demoUsers = getStoredUsers();
-  const taskDefaults = [
-    { id: 'task-101', title: 'Validar documentación', description: 'Revisar el conjunto de documentos del remate y confirmar que estén vigentes y completos antes del envío.', propertyTitle: 'Casa Los Alerces 1450', propertyPlace: 'Las Condes', propertyId: 1, assignedUserId: 'u1', dueDate: '2025-10-13', dueTime: '14:00', priority: 'critical', status: 'late', type: 'Documentación', workflowStage: 9, createdAt: '2025-10-10T09:15:00', completedAt: null, completed: false },
-    { id: 'task-102', title: 'Enviar carta al banco', description: 'Solicitar información al banco para confirmar la disponibilidad y los requisitos del préstamo.', propertyTitle: 'Depto. San Martín 588', propertyPlace: 'Santiago Centro', propertyId: 2, assignedUserId: 'u2', dueDate: '2025-10-14', dueTime: '15:30', priority: 'urgent', status: 'pending', type: 'Financiamiento', workflowStage: 5, createdAt: '2025-10-09T10:00:00', completedAt: null, completed: false },
-    { id: 'task-103', title: 'Preparar sala virtual', description: 'Conectar la sala virtual y validar que el equipo de participación esté listo.', propertyTitle: 'Casa El Roble 972', propertyPlace: 'Ñuñoa', propertyId: 3, assignedUserId: 'u3', dueDate: '2025-10-15', dueTime: '11:30', priority: 'urgent', status: 'in_progress', type: 'Participación', workflowStage: 13, createdAt: '2025-10-09T08:40:00', completedAt: null, completed: false },
-    { id: 'task-104', title: 'Revisar formulario de postulación', description: 'Confirmar que los datos del formulario coinciden con la documentación adjunta y con la oferta.', propertyTitle: 'Casa Valle Alegre 321', propertyPlace: 'La Florida', propertyId: 4, assignedUserId: 'u4', dueDate: '2025-10-15', dueTime: '16:00', priority: 'upcoming', status: 'pending', type: 'Participación', workflowStage: 6, createdAt: '2025-10-08T12:00:00', completedAt: null, completed: false },
-    { id: 'task-105', title: 'Actualizar cartera de garantías', description: 'Registrar los montos vigentes de la garantía y su estado financiero.', propertyTitle: 'Depto. Parque 1234', propertyPlace: 'Providencia', propertyId: 5, assignedUserId: 'u2', dueDate: '2025-10-17', dueTime: '10:00', priority: 'normal', status: 'completed', type: 'Garantías', workflowStage: 12, createdAt: '2025-10-07T09:45:00', completedAt: '2025-10-16T12:00:00', completed: true },
-    { id: 'task-106', title: 'Revisión legal final', description: 'Cargar el informe final de legal y confirmar que no quedan observaciones pendientes.', propertyTitle: 'Casa Mirador 777', propertyPlace: 'Peñalolén', propertyId: 6, assignedUserId: 'u5', dueDate: '2025-10-16', dueTime: '14:30', priority: 'urgent', status: 'blocked', type: 'Legal', workflowStage: 11, createdAt: '2025-10-06T11:00:00', completedAt: null, completed: false },
-    { id: 'task-107', title: 'Verificar disponibilidad de título', description: 'Solicitar y validar la documentación de dominio antes del remate.', propertyTitle: 'Terreno El Arrayán', propertyPlace: 'Lo Barnechea', propertyId: 7, assignedUserId: 'u1', dueDate: '2025-10-17', dueTime: '12:00', priority: 'upcoming', status: 'pending', type: 'Legal', workflowStage: 12, createdAt: '2025-10-07T15:30:00', completedAt: null, completed: false },
-    { id: 'task-108', title: 'Revisión de antecedentes', description: 'Revisar y confirmar antecedentes del vehículo y del propietario para la operación.', propertyTitle: 'Casa Los Hualtatas 5210', propertyPlace: 'Vitacura', propertyId: 8, assignedUserId: 'u3', dueDate: '2025-10-14', dueTime: '11:00', priority: 'normal', status: 'blocked', type: 'Legal', workflowStage: 7, createdAt: '2025-10-05T08:10:00', completedAt: null, completed: false },
-    { id: 'task-109', title: 'Actualizar entrada de evento', description: 'Confirmar la participación con la sala y documentar el acceso del equipo.', propertyTitle: 'Depto. Los Leones 890', propertyPlace: 'Providencia', propertyId: 9, assignedUserId: 'u4', dueDate: '2025-10-17', dueTime: '09:30', priority: 'normal', status: 'pending', type: 'Participación', workflowStage: 11, createdAt: '2025-10-08T11:00:00', completedAt: null, completed: false },
-    { id: 'task-110', title: 'Solicitar Vale Vista', description: 'Actualizar la solicitud de Vale Vista para la venta pública del inmueble.', propertyTitle: 'Casa Los Trapenses 2140', propertyPlace: 'Lo Barnechea', propertyId: 10, assignedUserId: 'u2', dueDate: '2025-10-20', dueTime: '10:30', priority: 'upcoming', status: 'pending', type: 'Documentación', workflowStage: 3, createdAt: '2025-10-08T16:00:00', completedAt: null, completed: false },
-    { id: 'task-111', title: 'Revisar carta al banco', description: 'Confirmar la recepción de la carta y su contenido para la próxima semana.', propertyTitle: 'Depto. Irarrázaval 3050', propertyPlace: 'Ñuñoa', propertyId: 11, assignedUserId: 'u1', dueDate: '2025-10-21', dueTime: '12:00', priority: 'urgent', status: 'pending', type: 'Financiamiento', workflowStage: 5, createdAt: '2025-10-10T07:30:00', completedAt: null, completed: false },
-    { id: 'task-112', title: 'Preparar asignación de gestor', description: 'Validar la asignación del gestor y del postor para la próxima subasta.', propertyTitle: 'Casa Camino El Alba 9120', propertyPlace: 'Las Condes', propertyId: 12, assignedUserId: 'u2', dueDate: '2025-10-22', dueTime: '09:00', priority: 'critical', status: 'late', type: 'Gestión', workflowStage: 2, createdAt: '2025-10-09T10:55:00', completedAt: null, completed: false },
-    { id: 'task-113', title: 'Confirmar requerimientos de formulario', description: 'Verificar que la información del formulario sea consistente con la documentación entregada.', propertyTitle: 'Parcela Chicureo 18', propertyPlace: 'Colina', propertyId: 13, assignedUserId: 'u3', dueDate: '2025-10-22', dueTime: '15:00', priority: 'upcoming', status: 'pending', type: 'Participación', workflowStage: 6, createdAt: '2025-10-08T09:15:00', completedAt: null, completed: false },
-    { id: 'task-114', title: 'Coordinar revisión legal', description: 'Revisar la revisión legal y dar continuidad a la próxima etapa.', propertyTitle: 'Depto. Av. Matta 455', propertyPlace: 'Santiago Centro', propertyId: 14, assignedUserId: 'u5', dueDate: '2025-10-23', dueTime: '11:00', priority: 'normal', status: 'completed', type: 'Legal', workflowStage: 4, createdAt: '2025-10-03T15:00:00', completedAt: '2025-10-21T11:00:00', completed: true },
-    { id: 'task-115', title: 'Validar entrega del expediente', description: 'Verificar que todas las piezas del expediente estén disponibles para la revisión.', propertyTitle: 'Casa Los Dominicos 730', propertyPlace: 'Las Condes', propertyId: 15, assignedUserId: 'u4', dueDate: '2025-10-24', dueTime: '16:30', priority: 'urgent', status: 'pending', type: 'Documentación', workflowStage: 7, createdAt: '2025-10-11T12:00:00', completedAt: null, completed: false },
-    { id: 'task-116', title: 'Seguimiento de adjudicación', description: 'Revisar el cierre del proceso y responder las solicitudes pendientes del cliente.', propertyTitle: 'Casa Pedro de Valdivia 2480', propertyPlace: 'Providencia', propertyId: 16, assignedUserId: 'u1', dueDate: '2025-10-06', dueTime: '10:00', priority: 'normal', status: 'completed', type: 'Cierre', workflowStage: 16, createdAt: '2025-10-05T09:00:00', completedAt: '2025-10-06T12:00:00', completed: true }
-  ];
+  const T = window.TareasData;
+  const demoUsers = T.loadUsers();
 
   const state = {
     users: demoUsers,
-    tasks: getStoredTasks(),
+    tasks: T.tasks(),
     activeUserId: getInitialUserId(demoUsers),
     search: '',
     statusFilter: 'all',
     typeFilter: 'all',
     quickFilter: 'all',
-    selectedTaskId: null
+    selectedTaskId: null,
+    collapsed: new Set(['completed']),
+    workloadPeriod: 'all'
   };
 
   const els = {
@@ -50,18 +25,14 @@
     taskTypeFilter: document.getElementById('taskTypeFilter'),
     upcomingList: document.getElementById('upcomingList'),
     workloadSummary: document.getElementById('workloadSummary'),
+    taskTypes: document.getElementById('taskTypes'),
+    upcomingAll: document.getElementById('upcomingAll'),
     tasksToast: document.getElementById('tasksToast'),
     taskModal: document.getElementById('taskModal'),
     taskModalContent: document.getElementById('taskModalContent')
   };
 
-  const statusMeta = {
-    pending: { label: 'Pendiente' },
-    in_progress: { label: 'En curso' },
-    completed: { label: 'Completada' },
-    late: { label: 'Atrasada' },
-    blocked: { label: 'Bloqueada' }
-  };
+  const statusMeta = Object.fromEntries(Object.entries(T.STATUS_LABEL).map(([key, label]) => [key, { label }]));
 
   const priorityMeta = {
     critical: { label: 'Crítica', className: 'critical' },
@@ -70,23 +41,8 @@
     normal: { label: 'Normal', className: 'normal' }
   };
 
-  function getStoredUsers() {
-    const saved = JSON.parse(localStorage.getItem(USER_STORAGE_KEY) || 'null');
-    return Array.isArray(saved) && saved.length ? saved : DEFAULT_USERS;
-  }
-
-  function getStoredTasks() {
-    const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
-    if (Array.isArray(saved) && saved.length) return saved;
-    return taskDefaults;
-  }
-
   function persistUsers() {
-    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(state.users));
-  }
-
-  function persistTasks() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state.tasks));
+    T.saveUsers(state.users);
   }
 
   function getInitialUserId(users) {
@@ -101,7 +57,8 @@
     void els.tasksToast.offsetWidth;
     els.tasksToast.classList.add('show');
     els.tasksToast.style.background = type === 'error' ? '#ef1d2d' : '#0b1f44';
-    setTimeout(() => els.tasksToast.classList.remove('show'), 2200);
+    clearTimeout(notify.timer);
+    notify.timer = setTimeout(() => els.tasksToast.classList.remove('show'), 2200);
   }
 
   function formatDate(dateString, timeString) {
@@ -116,33 +73,20 @@
     return state.users.find(user => user.id === userId) || { name: 'Sin asignación', email: '', role: 'Sin rol', team: 'Sin área', active: true };
   }
 
+  // Las tareas vienen armadas desde el workflow (TareasData.tasks), ya con su estado y su remate.
   function getTaskState(task) {
-    const taskDate = new Date(`${task.dueDate}T${task.dueTime || '00:00'}:00`);
-    const now = new Date('2025-10-16T18:00:00');
-    const isLate = task.status !== 'completed' && task.status !== 'blocked' && taskDate.getTime() < now.getTime();
-    if (task.status === 'completed') return 'completed';
-    if (task.status === 'blocked') return 'blocked';
-    if (isLate) return 'late';
-    if (task.status === 'in_progress') return 'in_progress';
-    return 'pending';
+    return task.status;
   }
 
   function normalizeTask(task) {
-    const status = getTaskState(task);
-    return { ...task, status };
-  }
-
-  function activeUserTasks() {
-    return state.tasks
-      .map(normalizeTask)
-      .filter(task => task.assignedUserId === state.activeUserId && task.status !== 'completed' ? true : task.assignedUserId === state.activeUserId);
+    return task;
   }
 
   function filterTasks(tasks) {
     const search = state.search.trim().toLowerCase();
     return tasks.filter(task => {
       const user = getUserById(task.assignedUserId);
-      const haystack = [task.title, task.propertyTitle, task.propertyPlace, user.name, task.type, task.status].join(' ').toLowerCase();
+      const haystack = [task.title, task.propertyTitle, task.propertyPlace, user.name, task.type, statusMeta[task.status]?.label].join(' ').toLowerCase();
       const matchesSearch = !search || haystack.includes(search);
       const matchesQuick = state.quickFilter === 'all' || filterByQuick(task, state.quickFilter);
       const matchesStatus = state.statusFilter === 'all' || task.status === state.statusFilter;
@@ -151,16 +95,18 @@
     });
   }
 
+  // Una tarea atrasada ya venció: no cuenta como «vence hoy» aunque su plazo fuera hoy.
+  const dueToday = task => task.status !== 'completed' && task.status !== 'late' && task.dueDate === T.TODAY;
+  const dueThisWeek = task => task.status !== 'completed' && T.inThisWeek(task);
+
   function filterByQuick(task, key) {
-    const now = new Date('2025-10-16T18:00:00');
-    const due = new Date(`${task.dueDate}T${task.dueTime || '00:00'}:00`);
     switch (key) {
       case 'today':
-        return task.dueDate === '2025-10-16';
+        return dueToday(task);
       case 'late':
         return task.status === 'late';
       case 'week':
-        return due.getTime() <= new Date('2025-10-22T23:59:59').getTime() && due.getTime() >= new Date('2025-10-13T00:00:00').getTime();
+        return dueThisWeek(task);
       case 'completed':
         return task.status === 'completed';
       default:
@@ -169,24 +115,20 @@
   }
 
   function updateMetrics(tasks) {
-    const active = tasks.filter(task => task.assignedUserId === state.activeUserId);
     const metrics = [
-      { key: 'all', label: 'Tareas activas', icon: 'flag', className: 'blue', value: active.filter(t => t.status !== 'completed').length },
-      { key: 'late', label: 'Tareas atrasadas', icon: 'clock', className: 'red', value: active.filter(t => t.status === 'late').length },
-      { key: 'today', label: 'Vencen hoy', icon: 'alert', className: 'amber', value: active.filter(t => t.dueDate === '2025-10-16').length },
-      { key: 'week', label: 'Vencen esta semana', icon: 'calendar', className: 'green', value: active.filter(t => {
-        const due = new Date(`${t.dueDate}T${t.dueTime || '00:00'}:00`);
-        return due >= new Date('2025-10-13T00:00:00') && due <= new Date('2025-10-22T23:59:59');
-      }).length }
+      { key: 'all', label: 'tareas activas', icon: 'flag', className: 'blue', value: tasks.filter(t => t.status !== 'completed').length },
+      { key: 'late', label: 'atrasadas', icon: 'alert', className: 'red', value: tasks.filter(t => t.status === 'late').length },
+      { key: 'today', label: 'vencen hoy', icon: 'clock', className: 'amber', value: tasks.filter(dueToday).length },
+      { key: 'week', label: 'esta semana', icon: 'calendar', className: 'green', value: tasks.filter(dueThisWeek).length }
     ];
 
     els.metrics.innerHTML = metrics.map(metric => `
       <button type="button" class="task-metric metric-${metric.className} ${state.quickFilter === metric.key ? 'active' : ''}" data-metric="${metric.key}">
+        <span class="metric-icon">${svgIcon(metric.icon)}</span>
         <div>
           <span class="value">${metric.value}</span>
           <span class="label">${metric.label}</span>
         </div>
-        <span class="metric-icon"><svg class="icon"><use href="#${metric.icon}" /></svg></span>
       </button>
     `).join('');
 
@@ -199,27 +141,30 @@
     });
   }
 
+  // Cada tarea aparece una sola vez, en el primer grupo que le corresponde.
   function buildGroups(tasks) {
     const groups = [
-      { key: 'late', title: 'Tareas atrasadas', predicate: task => task.status === 'late' },
-      { key: 'critical', title: 'Tareas críticas', predicate: task => task.priority === 'critical' && task.status !== 'completed' },
-      { key: 'today', title: 'Tareas próximas / hoy', predicate: task => task.dueDate === '2025-10-16' && task.status !== 'completed' },
-      { key: 'week', title: 'Tareas de esta semana', predicate: task => {
-        const due = new Date(`${task.dueDate}T${task.dueTime || '00:00'}:00`);
-        return task.status !== 'completed' && due >= new Date('2025-10-13T00:00:00') && due <= new Date('2025-10-22T23:59:59');
-      } },
-      { key: 'completed', title: 'Tareas completadas', predicate: task => task.status === 'completed' }
+      { key: 'late', icon: 'alert', title: 'Tareas atrasadas', predicate: task => task.status === 'late' },
+      { key: 'critical', icon: 'flame', title: 'Tareas críticas', predicate: task => task.priority === 'critical' && task.status !== 'completed' },
+      { key: 'today', icon: 'clock', title: 'Tareas de hoy', predicate: dueToday },
+      { key: 'week', icon: 'calendar', title: 'Tareas de esta semana', predicate: dueThisWeek },
+      { key: 'later', icon: 'flag', title: 'Tareas próximas', predicate: task => task.status !== 'completed' },
+      { key: 'completed', icon: 'check', title: 'Tareas completadas', predicate: task => task.status === 'completed' }
     ];
+    const placed = new Set();
 
     const html = groups.map(group => {
-      const items = tasks.filter(group.predicate);
+      const items = tasks.filter(task => !placed.has(task.id) && group.predicate(task));
       if (!items.length) return '';
+      items.forEach(task => placed.add(task.id));
+      const collapsed = state.collapsed.has(group.key);
       return `
-        <section class="task-group">
-          <div class="task-group-header">
-            <div class="task-group-title">${group.title}</div>
-            <span class="task-group-counter">${items.length}</span>
-          </div>
+        <section class="task-group tone-${group.key} ${collapsed ? 'collapsed' : ''}">
+          <button type="button" class="task-group-header" data-group-toggle="${group.key}" aria-expanded="${!collapsed}">
+            ${svgIcon(group.icon)}
+            <span class="task-group-title">${group.title} (${items.length})</span>
+            <span class="task-group-chevron" aria-hidden="true"></span>
+          </button>
           <div class="tasks-list">
             ${items.map(task => renderTaskItem(task)).join('')}
           </div>
@@ -230,117 +175,253 @@
     return html || '<div class="empty-state-box">No hay tareas para los filtros actuales.</div>';
   }
 
+  const svgIcon = name => `<svg class="icon"><use href="#${name}"></use></svg>`;
+  const TYPE_ICON = { 'Gestión': 'users', 'Vale Vista': 'card', 'Documentación': 'file', 'Legal': 'shield', 'Participación': 'monitor', 'Cierre': 'chart' };
+  const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+
+  // Una sola etiqueta por tarea: el estado cuando dice algo (atrasada, bloqueada, en curso, completada); si no, la prioridad.
+  function taskPill(task) {
+    if (['late', 'blocked', 'in_progress', 'completed'].includes(task.status)) {
+      return { label: statusMeta[task.status].label, className: `task-status ${task.status}`, tone: task.status === 'late' ? 'red' : task.status === 'in_progress' ? 'blue' : 'gray' };
+    }
+    const priority = priorityMeta[task.priority] || priorityMeta.normal;
+    return { label: priority.label, className: `task-priority ${priority.className}`, tone: { critical: 'red', urgent: 'amber', upcoming: 'blue' }[task.priority] || 'gray' };
+  }
+
+  // Tiempo que falta o que pasó desde el plazo, respecto del «hoy» de la maqueta: «Hace 2 días», «En 45 min».
+  function relativeDue(task) {
+    if (!task.dueAt) return '';
+    const minutes = Math.round((new Date(task.dueAt) - T.NOW) / 60000);
+    const abs = Math.abs(minutes);
+    const amount = abs < 60 ? `${abs} min` : abs < 1440 ? plural(Math.round(abs / 60), 'hora', 'horas') : plural(Math.round(abs / 1440), 'día', 'días');
+    return minutes < 0 ? `Hace ${amount}` : `En ${amount}`;
+  }
+
+  function dueUrgency(task) {
+    if (!task.dueAt) return '';
+    const hours = (new Date(task.dueAt) - T.NOW) / 3600000;
+    return hours < 0 ? 'is-late' : hours <= 24 ? 'is-soon' : '';
+  }
+
   function renderTaskItem(task) {
     const user = getUserById(task.assignedUserId);
+    const pill = taskPill(task);
+    const relative = relativeDue(task);
     return `
       <div class="task-item">
-        <input class="task-checkbox" type="checkbox" data-task-check="${task.id}" ${task.status === 'completed' ? 'checked' : ''}>
+        <input class="task-checkbox" type="checkbox" data-task-check="${task.id}" ${task.status === 'completed' ? 'checked disabled' : ''}>
         <div class="task-main">
-          <span class="task-title">${task.title}</span>
-          <span class="task-property">${task.propertyTitle} · ${task.propertyPlace}</span>
+          <span class="task-title">${escapeHtml(task.title)}</span>
+          <span class="task-property">${escapeHtml(task.propertyTitle)} · ${escapeHtml(task.propertyPlace)}</span>
         </div>
-        <div class="task-meta">
-          <strong>Ubicación</strong>
-          ${task.propertyPlace}
+        <div class="task-due ${dueUrgency(task)}">
+          <span class="task-due-date">${svgIcon('calendar')}${task.dueAt ? formatDate(task.dueDate, task.dueTime) : escapeHtml(task.dueText)}</span>
+          ${relative ? `<small>${relative}</small>` : ''}
         </div>
-        <div class="task-meta">
-          <strong>Vencimiento</strong>
-          ${formatDate(task.dueDate, task.dueTime)}
+        <div class="task-who">
+          ${svgIcon('users')}
+          <span><b>${escapeHtml(user.name)}</b><small>Responsable</small></span>
         </div>
-        <div class="task-meta">
-          <strong>Responsable</strong>
-          ${user.name}
-        </div>
-        <div class="task-type">${task.type}</div>
-        <div class="task-status ${statusMeta[task.status]?.label ? task.status : 'pending'}">${statusMeta[task.status]?.label || 'Pendiente'}</div>
-        <div class="task-priority ${priorityMeta[task.priority]?.className || 'normal'}">${priorityMeta[task.priority]?.label || 'Normal'}</div>
+        <div class="task-type">${svgIcon(TYPE_ICON[task.type] || 'file')}${escapeHtml(task.type)}</div>
+        <div class="${pill.className} task-pill">${pill.label}</div>
         <div class="task-actions">
           <button type="button" class="task-open-btn" data-open-task="${task.id}">Abrir tarea</button>
-          <button type="button" class="task-action-menu" data-open-task="${task.id}" aria-label="Más acciones">⋯</button>
+          <button type="button" class="task-action-menu" data-task-menu="${task.id}" aria-label="Más acciones" aria-haspopup="menu">⋯</button>
         </div>
       </div>
     `;
   }
 
+  function upcomingWhen(task) {
+    if (!task.dueAt) return escapeHtml(task.dueText);
+    const tomorrow = new Date(new Date(`${T.TODAY}T12:00:00`).getTime() + 86400000).toISOString().slice(0, 10);
+    const day = task.dueDate === T.TODAY ? 'Hoy' : task.dueDate === tomorrow ? 'Mañana'
+      : new Intl.DateTimeFormat('es-CL', { day: 'numeric', month: 'short' }).format(new Date(`${task.dueDate}T12:00:00`));
+    return `${day}, ${task.dueTime}`;
+  }
+
+  // Línea de tiempo con las próximas tareas abiertas del usuario, de la más urgente a la más lejana.
   function renderUpcoming() {
     const items = state.tasks
-      .map(normalizeTask)
       .filter(task => task.assignedUserId === state.activeUserId && task.status !== 'completed')
-      .sort((a, b) => new Date(`${a.dueDate}T${a.dueTime || '00:00'}:00`) - new Date(`${b.dueDate}T${b.dueTime || '00:00'}:00`))
-      .slice(0, 4);
+      .sort((a, b) => (a.dueAt || '9999').localeCompare(b.dueAt || '9999'))
+      .slice(0, 5);
 
     if (!items.length) {
       els.upcomingList.innerHTML = '<div class="empty-state-box">Sin vencimientos próximos.</div>';
       return;
     }
 
-    els.upcomingList.innerHTML = items.map(task => `
-      <div class="task-mini-item" data-open-task="${task.id}">
-        <span class="icon-wrap"><svg class="icon"><use href="#clock" /></svg></span>
-        <div>
-          <strong>${task.title}</strong>
-          <small>${task.propertyTitle}</small>
-          <small>${task.dueTime} · ${task.priority}</small>
+    els.upcomingList.innerHTML = `<div class="timeline">${items.map(task => {
+      const pill = taskPill(task);
+      return `
+        <div class="timeline-item tl-${pill.tone}" data-open-task="${task.id}">
+          <div>
+            <span class="timeline-when">${upcomingWhen(task)}</span>
+            <strong>${escapeHtml(task.title)}</strong>
+            <small>${escapeHtml(task.propertyTitle)}</small>
+          </div>
+          <span class="${pill.className} priority-pill">${pill.label}</span>
         </div>
-        <span class="task-priority ${priorityMeta[task.priority]?.className || 'normal'} priority-pill">${priorityMeta[task.priority]?.label || 'Normal'}</span>
-      </div>
-    `).join('');
+      `;
+    }).join('')}</div>`;
   }
 
+  // Dona con la carga del usuario por urgencia; cada tarea cae en una sola categoría.
   function renderWorkload() {
-    const tasks = state.tasks.filter(task => task.assignedUserId === state.activeUserId);
-    const totals = {
-      pending: tasks.filter(task => task.status === 'pending').length,
-      in_progress: tasks.filter(task => task.status === 'in_progress').length,
-      completed: tasks.filter(task => task.status === 'completed').length,
-      late: tasks.filter(task => task.status === 'late').length,
-      blocked: tasks.filter(task => task.status === 'blocked').length
-    };
-    const total = tasks.length || 1;
-    const rows = [
-      { label: 'Pendientes', value: totals.pending, color: '#1268f3' },
-      { label: 'En curso', value: totals.in_progress, color: '#6b43d6' },
-      { label: 'Completadas', value: totals.completed, color: '#078b43' },
-      { label: 'Atrasadas', value: totals.late, color: '#ef1d2d' },
-      { label: 'Bloqueadas', value: totals.blocked, color: '#57657d' }
-    ];
+    const mine = state.tasks.filter(task => task.assignedUserId === state.activeUserId);
+    const tasks = state.workloadPeriod === 'week' ? mine.filter(T.inThisWeek) : mine;
+    const open = task => task.status !== 'completed';
+    const buckets = [
+      { label: 'Atrasadas', color: '#ef1d2d', test: task => task.status === 'late' },
+      { label: 'Vencen hoy', color: '#f0a000', test: dueToday },
+      { label: 'Resto de la semana', color: '#1268f3', test: task => open(task) && T.inThisWeek(task) },
+      { label: 'Próximas', color: '#b9c6d8', test: open },
+      { label: 'Completadas', color: '#16a559', test: () => true }
+    ].map(bucket => ({ ...bucket, count: 0 }));
+    tasks.forEach(task => { buckets.find(bucket => bucket.test(task)).count += 1; });
 
-    const typeCounts = Object.entries(
-      tasks.reduce((acc, task) => {
-        acc[task.type] = (acc[task.type] || 0) + 1;
-        return acc;
-      }, {})
-    );
-
-    const typeHtml = typeCounts.length ? typeCounts.map(([label, count]) => `
-      <div class="workload-row">
-        <span>${label}</span>
-        <div class="bar-track"><span class="bar-fill" style="width:${(count / total) * 100}%;"></span></div>
-        <strong>${count}</strong>
-      </div>
-    `).join('') : '<div class="empty-state-box">Sin tareas asignadas.</div>';
+    const total = tasks.length;
+    const circumference = 2 * Math.PI * 48;
+    let offset = 0;
+    const segments = buckets.filter(bucket => bucket.count).map(bucket => {
+      const length = bucket.count / total * circumference;
+      const segment = `<circle cx="60" cy="60" r="48" stroke="${bucket.color}" stroke-dasharray="${Math.max(0, length - 3)} ${circumference}" stroke-dashoffset="${-offset}"><title>${bucket.label}: ${bucket.count}</title></circle>`;
+      offset += length;
+      return segment;
+    }).join('');
 
     els.workloadSummary.innerHTML = `
-      <div class="workload-summary">
-        <div class="workload-total">
-          <span>Total</span>
-          <strong>${tasks.length}</strong>
+      <select class="workload-period" id="workloadPeriod" aria-label="Período">
+        <option value="all" ${state.workloadPeriod === 'all' ? 'selected' : ''}>Todas</option>
+        <option value="week" ${state.workloadPeriod === 'week' ? 'selected' : ''}>Esta semana</option>
+      </select>
+      <div class="donut-wrap">
+        <div class="donut">
+          <svg viewBox="0 0 120 120" role="img" aria-label="Carga de trabajo: ${plural(total, 'tarea', 'tareas')}">
+            <circle cx="60" cy="60" r="48" stroke="#eef2f7"></circle>
+            ${segments}
+          </svg>
+          <div class="donut-center"><strong>${total}</strong><span>${total === 1 ? 'tarea' : 'tareas'}</span></div>
         </div>
-        <div class="workload-bars">
-          ${rows.map(row => `
-            <div class="workload-row">
-              <span>${row.label}</span>
-              <div class="bar-track"><span class="bar-fill" style="width:${(row.value / total) * 100}%;background:${row.color};"></span></div>
-              <strong>${row.value}</strong>
-            </div>
-          `).join('')}
-        </div>
-        <div>
-          <h4 style="margin:0 0 10px;color:var(--task-navy);">Distribución por tipo</h4>
-          ${typeHtml}
+        <div class="donut-legend">
+          ${buckets.map(bucket => `<div><i style="background:${bucket.color}"></i><b>${bucket.count}</b>${bucket.label}</div>`).join('')}
         </div>
       </div>
     `;
+    document.getElementById('workloadPeriod').onchange = e => {
+      state.workloadPeriod = e.target.value;
+      renderWorkload();
+    };
+
+    const types = Object.entries(tasks.reduce((acc, task) => {
+      acc[task.type] = (acc[task.type] || 0) + 1;
+      return acc;
+    }, {})).sort((a, b) => b[1] - a[1]);
+    const max = Math.max(1, ...types.map(([, count]) => count));
+    els.taskTypes.innerHTML = types.length ? types.map(([label, count]) => `
+      <div class="type-row">
+        ${svgIcon(TYPE_ICON[label] || 'file')}
+        <span>${escapeHtml(label)}</span>
+        <div class="type-track"><i style="width:${count / max * 100}%"></i></div>
+        <b>${count}</b>
+      </div>
+    `).join('') : '<div class="empty-state-box">Sin tareas asignadas.</div>';
+  }
+
+  // Lo que se vuelve a enlazar en cada render: contraer grupos y «Ver todas».
+  function bindListActions() {
+    document.querySelectorAll('[data-group-toggle]').forEach(button => {
+      button.onclick = () => {
+        const key = button.dataset.groupToggle;
+        if (state.collapsed.has(key)) state.collapsed.delete(key); else state.collapsed.add(key);
+        render();
+      };
+    });
+    els.upcomingAll.onclick = () => {
+      Object.assign(state, { search: '', statusFilter: 'all', typeFilter: 'all', quickFilter: 'all' });
+      render();
+      els.taskGroups.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+  }
+
+  // Menú «⋯»: acciones rápidas sobre la tarea sin abrir su modal.
+  function openTaskMenu(button) {
+    const wasOpenFor = document.getElementById('taskMenu')?.dataset.task;
+    closeTaskMenu();
+    const task = state.tasks.find(item => item.id === button.dataset.taskMenu);
+    if (!task || wasOpenFor === task.id) return;
+    const isOpen = task.status !== 'completed';
+    // Si el bloqueo viene del remate suspendido, se resuelve reanudando el remate, no desde la tarea.
+    const editable = isOpen && getRelatedProperty(task)?.status !== 'SUSPENDIDO';
+    const mark = task.notes.status;
+    const actions = [
+      isOpen && ['reassign', 'Reasignar'],
+      editable && mark !== 'blocked' && (mark === 'in_progress' ? ['pending', 'Marcar pendiente'] : ['in_progress', 'Marcar en curso']),
+      editable && (mark === 'blocked' ? ['pending', 'Desbloquear'] : ['blocked', 'Bloquear'])
+    ].filter(Boolean);
+
+    const menu = document.createElement('div');
+    menu.id = 'taskMenu';
+    menu.className = 'task-menu';
+    menu.dataset.task = task.id;
+    menu.setAttribute('role', 'menu');
+    menu.innerHTML = actions.map(([action, label]) => `<button type="button" role="menuitem" data-menu-action="${action}">${label}</button>`).join('')
+      + `<a role="menuitem" href="hello.html?id=${task.propertyId}">Ver remate</a>`;
+    document.body.append(menu);
+    const rect = button.getBoundingClientRect();
+    menu.style.top = `${Math.max(8, Math.min(innerHeight - menu.offsetHeight - 8, rect.bottom + 6))}px`;
+    menu.style.left = `${Math.max(8, rect.right - menu.offsetWidth)}px`;
+
+    menu.addEventListener('click', e => {
+      const action = e.target.dataset.menuAction;
+      if (!action) return;
+      closeTaskMenu();
+      if (action === 'reassign') {
+        openReassignModal(task);
+        return;
+      }
+      T.saveNote(task, { status: action === 'pending' ? null : action });
+      notify({ in_progress: 'Tarea marcada en curso', blocked: 'Tarea bloqueada', pending: 'Tarea marcada como pendiente' }[action]);
+      render();
+    });
+  }
+
+  function closeTaskMenu() {
+    document.getElementById('taskMenu')?.remove();
+  }
+
+  function openReassignModal(task) {
+    els.taskModalContent.innerHTML = `
+      <div class="task-modal-body">
+        <div class="task-modal-header">
+          <div><h3>Reasignar tarea</h3></div>
+        </div>
+        ${renderPropertySummary(task)}
+        <form class="task-form" id="reassignForm">
+          <label>
+            Nuevo responsable de «${escapeHtml(task.title)}»
+            <select name="assignedUserId">
+              ${state.users.filter(item => item.active || item.id === task.assignedUserId).map(item => `<option value="${escapeHtml(item.id)}" ${item.id === task.assignedUserId ? 'selected' : ''}>${escapeHtml(item.name)} · ${escapeHtml(item.role)}</option>`).join('')}
+            </select>
+          </label>
+          <div class="task-modal-actions">
+            <button type="submit" class="primary-action">Reasignar</button>
+            <button type="button" class="secondary-action" data-close-task-modal="true">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    `;
+    const form = document.getElementById('reassignForm');
+    form.addEventListener('submit', e => {
+      e.preventDefault();
+      const userId = new FormData(form).get('assignedUserId');
+      T.saveNote(task, { assignedUserId: userId });
+      notify(`Tarea reasignada a ${getUserById(userId).name}`);
+      closeTaskModal();
+      render();
+    });
+    showTaskModal();
   }
 
   function renderFilters() {
@@ -378,13 +459,14 @@
     };
   }
 
+  // Incluye a los usuarios inactivos que todavía tienen tareas abiertas, para que no queden inaccesibles.
   function renderUserSelect() {
-    const activeUsers = state.users.filter(user => user.active);
-    const fallbackUserId = activeUsers[0]?.id || state.users[0]?.id;
-    if (!activeUsers.some(user => user.id === state.activeUserId) && fallbackUserId) {
-      state.activeUserId = fallbackUserId;
+    const hasOpenTasks = user => state.tasks.some(task => task.assignedUserId === user.id && task.status !== 'completed');
+    const selectable = state.users.filter(user => user.active || hasOpenTasks(user));
+    if (!selectable.some(user => user.id === state.activeUserId) && selectable[0]) {
+      state.activeUserId = selectable[0].id;
     }
-    els.activeUserSelect.innerHTML = activeUsers.map(user => `<option value="${user.id}">${user.name}</option>`).join('');
+    els.activeUserSelect.innerHTML = selectable.map(user => `<option value="${escapeHtml(user.id)}">${escapeHtml(user.name)}${user.active ? '' : ' (inactivo)'}</option>`).join('');
     els.activeUserSelect.value = state.activeUserId;
     els.activeUserSelect.onchange = e => {
       state.activeUserId = e.target.value;
@@ -394,7 +476,8 @@
   }
 
   function render() {
-    const normalizedTasks = state.tasks.map(normalizeTask);
+    state.tasks = T.tasks();
+    const normalizedTasks = state.tasks;
     const userTasks = normalizedTasks.filter(task => task.assignedUserId === state.activeUserId);
     const filtered = filterTasks(userTasks);
     renderUserSelect();
@@ -410,55 +493,66 @@
       render();
     };
 
-    document.querySelectorAll('[data-open-task]').forEach(button => {
-      button.addEventListener('click', () => openTaskModal(button.dataset.openTask));
-    });
-
     document.querySelectorAll('[data-task-check]').forEach(checkbox => {
-      checkbox.addEventListener('change', e => {
+      checkbox.addEventListener('change', () => {
         const task = state.tasks.find(item => item.id === checkbox.dataset.taskCheck);
-        if (!task) return;
-        if (task.status === 'blocked') {
-          notify('Debe resolver el bloqueo antes de completar esta tarea.', 'error');
-          checkbox.checked = false;
+        if (!task || !completeTask(task)) {
+          checkbox.checked = task?.status === 'completed';
           return;
         }
-        const nextStatus = e.target.checked ? 'completed' : 'pending';
-        task.status = nextStatus;
-        task.completed = nextStatus === 'completed';
-        if (nextStatus === 'completed') task.completedAt = new Date().toISOString();
-        persistTasks();
-        notify('Tarea actualizada correctamente');
         render();
       });
     });
+    bindListActions();
+  }
+
+  // Completar una tarea avanza el workflow de su remate; la siguiente tarea le aparece a quien corresponda.
+  function completeTask(task) {
+    if (task.needsBoard) {
+      notify('El resultado se elige en el flujo del remate. Usa «Ver remate».', 'error');
+      return false;
+    }
+    if (task.status === 'blocked') {
+      notify('Debe resolver el bloqueo antes de completar esta tarea.', 'error');
+      return false;
+    }
+    const remate = T.complete(task);
+    if (!remate) {
+      notify('La tarea ya no es la actual de su remate.', 'error');
+      return false;
+    }
+    notify(`Tarea completada. El remate pasa a «${remate.stage}».`);
+    return true;
   }
 
   function openTaskModal(taskId) {
     const task = state.tasks.find(item => item.id === taskId);
     if (!task) return;
-    if (task.workflowStage === 3 || /carta vale vista/i.test(task.title)) {
+    if (task.step === 3) {
       openValeVistaModal(task);
       return;
     }
-    if (task.workflowStage === 2 || /asignar gestor y postor/i.test(task.title)) {
+    if (task.step === 2 && task.status !== 'completed') {
       openAssignmentModal(task);
       return;
     }
 
     els.taskModal.querySelector('.task-modal-dialog').className = 'task-modal-dialog';
     const user = getUserById(task.assignedUserId);
-    const status = statusMeta[task.status]?.label || 'Pendiente';
+    const shownStatus = getTaskState(task);
+    const status = statusMeta[shownStatus]?.label || 'Pendiente';
+    const property = taskPropertySummary(task);
     const priority = priorityMeta[task.priority]?.label || 'Normal';
+    const locked = task.status === 'completed' ? 'disabled' : '';
     els.taskModalContent.innerHTML = `
       <div class="task-modal-body">
         <div class="task-modal-header">
           <div>
-            <h3>${task.title}</h3>
+            <h3>${escapeHtml(task.title)}</h3>
             <div class="meta-row">
-              <span class="task-type">${task.type}</span>
+              <span class="task-type">${escapeHtml(task.type)}</span>
               <span class="task-priority ${priorityMeta[task.priority]?.className || 'normal'}">${priority}</span>
-              <span class="task-status ${task.status}">${status}</span>
+              <span class="task-status ${shownStatus}">${status}</span>
             </div>
           </div>
         </div>
@@ -466,31 +560,31 @@
         <div class="task-modal-summary">
           <div class="task-summary-card">
             <strong>Remate</strong>
-            <span>${task.propertyTitle}</span>
+            <span>${escapeHtml(property.title)}</span>
           </div>
           <div class="task-summary-card">
             <strong>Responsable</strong>
-            <span>${user.name}</span>
+            <span>${escapeHtml(user.name)}</span>
           </div>
           <div class="task-summary-card">
             <strong>Vencimiento</strong>
-            <span>${formatDate(task.dueDate, task.dueTime)}</span>
+            <span>${escapeHtml(task.dueText)}</span>
           </div>
           <div class="task-summary-card">
             <strong>Ubicación</strong>
-            <span>${task.propertyPlace}</span>
+            <span>${escapeHtml(property.place)}</span>
           </div>
         </div>
 
         <div class="task-modal-description">
-          ${task.description || 'No hay descripción disponible para esta tarea.'}
+          ${escapeHtml(task.description || 'No hay descripción disponible para esta tarea.')}
         </div>
 
         <form class="task-form" id="taskForm">
           <div class="task-form-row">
             <label>
               Estado
-              <select name="status">
+              <select name="status" ${locked}>
                 <option value="pending" ${task.status === 'pending' ? 'selected' : ''}>Pendiente</option>
                 <option value="in_progress" ${task.status === 'in_progress' ? 'selected' : ''}>En curso</option>
                 <option value="blocked" ${task.status === 'blocked' ? 'selected' : ''}>Bloqueada</option>
@@ -498,49 +592,21 @@
               </select>
             </label>
             <label>
-              Prioridad
-              <select name="priority">
-                <option value="critical" ${task.priority === 'critical' ? 'selected' : ''}>Crítica</option>
-                <option value="urgent" ${task.priority === 'urgent' ? 'selected' : ''}>Urgente</option>
-                <option value="upcoming" ${task.priority === 'upcoming' ? 'selected' : ''}>Próxima</option>
-                <option value="normal" ${task.priority === 'normal' ? 'selected' : ''}>Normal</option>
-              </select>
-            </label>
-          </div>
-
-          <div class="task-form-row">
-            <label>
               Responsable
-              <select name="assignedUserId">
-                ${state.users.filter(user => user.active).map(user => `<option value="${user.id}" ${user.id === task.assignedUserId ? 'selected' : ''}>${user.name}</option>`).join('')}
+              <select name="assignedUserId" ${locked}>
+                ${state.users.filter(item => item.active || item.id === task.assignedUserId).map(item => `<option value="${escapeHtml(item.id)}" ${item.id === task.assignedUserId ? 'selected' : ''}>${escapeHtml(item.name)}</option>`).join('')}
               </select>
-            </label>
-            <label>
-              Tipo de tarea
-              <select name="type">
-                ${Array.from(new Set(state.tasks.map(item => item.type))).map(type => `<option value="${type}" ${type === task.type ? 'selected' : ''}>${type}</option>`).join('')}
-              </select>
-            </label>
-          </div>
-
-          <div class="task-form-row">
-            <label>
-              Fecha de vencimiento
-              <input type="date" name="dueDate" value="${task.dueDate}">
-            </label>
-            <label>
-              Hora
-              <input type="time" name="dueTime" value="${task.dueTime}">
             </label>
           </div>
 
           <label>
             Descripción
-            <textarea name="description">${task.description}</textarea>
+            <textarea name="description" ${locked}>${escapeHtml(task.description)}</textarea>
           </label>
 
           <div class="task-modal-actions">
-            <button type="submit" class="primary-action">Guardar cambios</button>
+            ${locked ? '' : '<button type="submit" class="primary-action">Guardar cambios</button>'}
+            <a class="secondary-action" href="hello.html?id=${task.propertyId}">Ver remate</a>
             <button type="button" class="secondary-action" data-close-task-modal="true">Cerrar</button>
           </div>
         </form>
@@ -551,31 +617,23 @@
     form.addEventListener('submit', e => {
       e.preventDefault();
       const formData = new FormData(form);
-      const updates = {
-        status: formData.get('status'),
-        priority: formData.get('priority'),
-        assignedUserId: formData.get('assignedUserId'),
-        type: formData.get('type'),
-        dueDate: formData.get('dueDate'),
-        dueTime: formData.get('dueTime'),
-        description: formData.get('description')
-      };
-
-      if (!updates.dueDate || !updates.description.trim()) {
-        notify('Completa la fecha y la descripción antes de guardar.', 'error');
+      const status = formData.get('status');
+      const description = String(formData.get('description') || '').trim();
+      if (!description) {
+        notify('Completa la descripción antes de guardar.', 'error');
         return;
       }
-
-      Object.assign(task, updates);
-      if (updates.status === 'completed') {
-        task.completedAt = new Date().toISOString();
-        task.completed = true;
+      // Tipo, prioridad y plazo no se editan: salen del remate. Aquí solo se guarda lo propio de la tarea.
+      T.saveNote(task, {
+        status: status === 'in_progress' || status === 'blocked' ? status : null,
+        assignedUserId: formData.get('assignedUserId'),
+        description
+      });
+      if (status === 'completed') {
+        if (!completeTask(task)) return;
       } else {
-        task.completed = false;
-        task.completedAt = null;
+        notify('Tarea guardada con éxito');
       }
-      persistTasks();
-      notify('Tarea guardada con éxito');
       closeTaskModal();
       render();
     });
@@ -637,17 +695,21 @@
     });
   }
 
-  function getActiveUserOptions(selectedId = '') {
-    return `<option value="">Selecciona una persona</option>${state.users.filter(user => user.active).map(user =>
+  // Con role, ofrece solo a los usuarios activos de ese rol (si hay alguno).
+  function getActiveUserOptions(selectedId = '', role = '') {
+    const active = state.users.filter(user => user.active);
+    const ofRole = active.filter(user => !role || window.RematesData.userRoles[user.role] === role);
+    return `<option value="">Selecciona una persona</option>${(ofRole.length ? ofRole : active).map(user =>
       `<option value="${escapeHtml(user.id)}" ${user.id === selectedId ? 'selected' : ''}>${escapeHtml(user.name)} · ${escapeHtml(user.role)}</option>`
     ).join('')}`;
   }
 
   function openValeVistaModal(task) {
     const property = taskPropertySummary(task);
-    const previous = task.valeVistaRequest || {};
+    const previous = task.notes.valeVistaRequest || {};
     const remate = getRelatedProperty(task);
     const defaultDateTime = `${property.iso}T${property.time || '10:00'}`;
+    const guaranteeAmount = previous.amount ?? (remate ? Math.round(remate.minimum) / 10 : '');
     const generationDate = previous.generatedAt
       ? new Intl.DateTimeFormat('es-CL', { dateStyle: 'medium', timeStyle: 'short' }).format(new Date(previous.generatedAt))
       : 'Aún no generado';
@@ -675,8 +737,8 @@
               <label>Ejecutivo bancario
                 <input name="executive" value="${escapeHtml(previous.executive || '')}" placeholder="Nombre del ejecutivo" required>
               </label>
-              <label>Monto garantía
-                <input name="amount" type="number" min="1" step="any" value="${escapeHtml(previous.amount ?? remate?.minimum ?? '')}" placeholder="Monto en UF" required>
+              <label>Monto garantía (MM$)
+                <input name="amount" type="number" min="1" step="any" value="${escapeHtml(guaranteeAmount)}" placeholder="Monto en MM$" required>
               </label>
               <label>Tribunal
                 <input name="court" value="${escapeHtml(previous.court || '')}" placeholder="Tribunal civil" required>
@@ -727,7 +789,7 @@
             <div id="valeVistaPreviewContent" class="action-document-preview" hidden>
               <strong>Vista previa de demostración</strong>
               <span>Este contenido es ilustrativo. No existe un archivo PDF generado ni se ha enviado un correo.</span>
-              <span>Propiedad: ${escapeHtml(property.title)} · Garantía: ${escapeHtml(previous.amount ?? remate?.minimum ?? '—')} UF</span>
+              <span>Propiedad: ${escapeHtml(property.title)} · Garantía: MM$ ${escapeHtml(guaranteeAmount === '' ? '—' : guaranteeAmount)}</span>
             </div>
           </section>
 
@@ -769,8 +831,7 @@
     document.querySelector('[data-generate-letter]').addEventListener('click', () => {
       const request = readRequest(false);
       if (!request) return;
-      task.valeVistaRequest = { ...request, generatedAt: new Date().toISOString() };
-      persistTasks();
+      T.saveNote(task, { valeVistaRequest: { ...request, generatedAt: new Date().toISOString() } });
       notify('Carta generada en modo demostración; no se creó un PDF real.');
       closeTaskModal();
     });
@@ -778,8 +839,7 @@
     document.querySelector('[data-send-letter]').addEventListener('click', () => {
       const request = readRequest(true);
       if (!request) return;
-      task.valeVistaRequest = { ...request, generatedAt: new Date().toISOString(), sentAt: new Date().toISOString() };
-      persistTasks();
+      T.saveNote(task, { valeVistaRequest: { ...request, generatedAt: new Date().toISOString(), sentAt: new Date().toISOString() } });
       notify('Envío simulado: no se envió ningún correo real.');
       closeTaskModal();
     });
@@ -788,39 +848,24 @@
   }
 
   const DEMO_ASSIGNMENT_CONFLICTS = [
-    { propertyId: 9001, title: 'Casa Parque Norte 340', place: 'Ñuñoa', iso: '2025-10-22', time: '09:00', bidderId: 'u2' }
+    { propertyId: 9001, title: 'Casa Parque Norte 340', place: 'Ñuñoa', iso: '2025-10-22', time: '09:00', bidderId: 'u4' }
   ];
 
-  function getAuctionSlot(propertyId, task) {
-    const property = window.RematesData?.items.find(item => item.id === Number(propertyId));
-    return property ? { iso: property.iso, time: property.time, title: property.title } : {
-      iso: task.dueDate, time: task.dueTime, title: task.propertyTitle
-    };
-  }
-
+  // Un postor no puede tener dos remates a la misma hora: se compara contra los demás remates abiertos.
   function findBidderConflict(task, bidderId) {
-    const slot = getAuctionSlot(task.propertyId, task);
-    const scheduledTasks = state.tasks.filter(other => {
-      if (other.id === task.id || other.assignment?.bidderId !== bidderId) return false;
-      const otherSlot = getAuctionSlot(other.propertyId, other);
-      return otherSlot.iso === slot.iso && otherSlot.time === slot.time;
-    });
-    const demoConflict = DEMO_ASSIGNMENT_CONFLICTS.find(other =>
-      other.bidderId === bidderId && other.iso === slot.iso && other.time === slot.time
-    );
-    if (demoConflict) return demoConflict;
-    if (!scheduledTasks.length) return null;
-    const otherTask = scheduledTasks[0];
-    const otherSlot = getAuctionSlot(otherTask.propertyId, otherTask);
-    return { title: otherSlot.title, place: getRelatedProperty(otherTask)?.place || otherTask.propertyPlace };
+    const remate = getRelatedProperty(task);
+    if (!remate || !bidderId) return null;
+    const sameSlot = other => other.iso === remate.iso && other.time === remate.time;
+    return DEMO_ASSIGNMENT_CONFLICTS.find(other => other.bidderId === bidderId && sameSlot(other))
+      || window.RematesData.items.find(other => other.id !== remate.id && other.postorId === bidderId && sameSlot(other) && window.RematesData.currentTask(other))
+      || null;
   }
 
+  // El gestor y el postor se guardan en el remate: desde ahí se reparten sus tareas.
   function openAssignmentModal(task) {
     const property = taskPropertySummary(task);
-    const assignment = task.assignment || {};
-    const currentUserId = state.users.some(user => user.active && user.id === task.assignedUserId)
-      ? task.assignedUserId
-      : '';
+    const remate = getRelatedProperty(task) || {};
+    const assignment = { managerId: remate.gestorId, managerBackupId: remate.gestorBackupId, bidderId: remate.postorId, bidderBackupId: remate.postorBackupId };
 
     els.taskModalContent.innerHTML = `
       <div class="task-modal-body action-modal-body assignment-modal-body">
@@ -832,17 +877,17 @@
         <form class="action-modal-form" id="assignmentForm" novalidate>
           <section class="action-modal-section assignment-fields">
             <label>Gestor
-              <select name="managerId" required>${getActiveUserOptions(assignment.managerId || currentUserId)}</select>
+              <select name="managerId" required>${getActiveUserOptions(assignment.managerId, 'gestor')}</select>
             </label>
             <label>Suplente Gestor
-              <select name="managerBackupId" required>${getActiveUserOptions(assignment.managerBackupId || '')}</select>
+              <select name="managerBackupId" required>${getActiveUserOptions(assignment.managerBackupId, 'gestor')}</select>
             </label>
             <label>Postor
-              <select name="bidderId" id="assignmentBidder" required>${getActiveUserOptions(assignment.bidderId || '')}</select>
+              <select name="bidderId" id="assignmentBidder" required>${getActiveUserOptions(assignment.bidderId, 'postor')}</select>
             </label>
             <div id="bidderConflict" class="assignment-conflict" role="status" aria-live="polite" hidden></div>
             <label>Suplente Postor
-              <select name="bidderBackupId" required>${getActiveUserOptions(assignment.bidderBackupId || '')}</select>
+              <select name="bidderBackupId" required>${getActiveUserOptions(assignment.bidderBackupId, 'postor')}</select>
             </label>
           </section>
           <footer class="action-modal-actions">
@@ -877,16 +922,13 @@
         return;
       }
       const values = Object.fromEntries(new FormData(form).entries());
-      task.assignment = {
-        managerId: values.managerId,
-        managerBackupId: values.managerBackupId,
-        bidderId: values.bidderId,
-        bidderBackupId: values.bidderBackupId,
-        savedAt: new Date().toISOString()
-      };
-      task.assignedUserId = values.managerId;
-      persistTasks();
-      notify('Asignación guardada en la maqueta.');
+      window.RematesData.update(task.propertyId, {
+        gestorId: values.managerId,
+        gestorBackupId: values.managerBackupId,
+        postorId: values.bidderId,
+        postorBackupId: values.bidderBackupId
+      });
+      notify('Gestor y postor asignados al remate.');
       closeTaskModal();
       render();
     });
@@ -900,11 +942,20 @@
   }
 
   document.addEventListener('click', e => {
+    const menuButton = e.target.closest('[data-task-menu]');
+    if (menuButton) {
+      openTaskMenu(menuButton);
+      return;
+    }
+    if (!e.target.closest('#taskMenu')) closeTaskMenu();
     const trigger = e.target.closest('[data-open-task]');
     if (trigger && !e.target.closest('input')) {
       openTaskModal(trigger.dataset.openTask);
     }
   });
+
+  window.addEventListener('scroll', closeTaskMenu, true);
+  window.addEventListener('resize', closeTaskMenu);
 
   els.taskModal.addEventListener('click', e => {
     if (e.target.dataset.closeTaskModal === 'true') closeTaskModal();

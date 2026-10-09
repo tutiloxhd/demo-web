@@ -1,6 +1,5 @@
 // Reportes: panel de gerencia. Usa R, week, weekBar, bindWeek, toast y statusClass de pages.js.
-// Las claves de tareas por resultado son las mismas de RESULT_BRANCHES en app.js.
-const BRANCH_TASKS = { ADJUDICADO: ['17A', '18A', '19A'], NO_ADJUDICADO: ['17B', '18B'], REPROGRAMADO: ['17C', '17D', '17E'] };
+const BRANCH_TASKS = Object.fromEntries(Object.entries(R.branches).map(([key, branch]) => [key, branch.tasks.map(([task]) => task)]));
 const OUTCOME_LABEL = { ADJUDICADO: 'Adjudicado', NO_ADJUDICADO: 'No adjudicado', REPROGRAMADO: 'Reprogramado' };
 const STATUS_INFO = [
     ['ATRASADO', 'Atrasado', '#ef1d2d'],

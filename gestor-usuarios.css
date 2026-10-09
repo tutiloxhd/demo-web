@@ -19,10 +19,10 @@
   min-height: 100vh;
   background: var(--users-bg);
   font-family: inherit;
-  font-size: 13px;
 }
 
 .users-main {
+  font-size: 13px;
   min-width: 0;
 }
 
@@ -384,4 +384,63 @@
   .user-form-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* Correcciones de consistencia */
+/* styles.css oculta la barra lateral hasta 1100px; la grilla debe soltar su columna en el mismo punto. */
+@media (max-width: 1100px) {
+  .users-page-shell {
+    display: block;
+    padding-bottom: 74px;
+  }
+}
+
+/* En teléfono cada usuario pasa a tarjeta, sin scroll horizontal y con las acciones a la vista. */
+@media (max-width: 700px) {
+  .users-table,
+  .users-table tbody {
+    display: block;
+    min-width: 0;
+  }
+
+  .users-table thead {
+    display: none;
+  }
+
+  .users-table tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 10px 12px;
+    padding: 14px;
+    border-bottom: 1px solid var(--users-border, #dfe7f2);
+  }
+
+  .users-table td {
+    display: block;
+    padding: 0;
+    border: 0;
+  }
+
+  .users-table td:nth-child(1) { grid-area: 1 / 1; }
+  .users-table td:nth-child(5) { grid-area: 1 / 2; justify-self: end; }
+  .users-table td:nth-child(2) { grid-area: 2 / 1 / auto / -1; }
+  .users-table td:nth-child(3) { grid-area: 3 / 1 / auto / -1; }
+  .users-table td:nth-child(4) { display: none; }
+  .users-table td:nth-child(6) { grid-area: 4 / 1; }
+  .users-table td:nth-child(7) { grid-area: 4 / 2; }
+  .users-table td:nth-child(8) { grid-area: 5 / 1 / auto / -1; }
+}
+
+/* Modal de confirmación */
+.user-confirm-text {
+  margin: 0 0 18px;
+  color: var(--users-navy);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.user-form-actions .primary.danger {
+  border-color: #ef1d2d;
+  background: #ef1d2d;
 }

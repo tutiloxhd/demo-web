@@ -1,16 +1,9 @@
 (function () {
-  const USER_STORAGE_KEY = 'inmoremates-demo-users';
-  const TASK_STORAGE_KEY = 'inmoremates-demo-tasks';
-  const DEFAULT_USERS = [
-    { id: 'u1', name: 'María González', email: 'maria.gonzalez@inmoremates.cl', role: 'Administrador', team: 'Dirección', active: true, avatar: 'https://i.pravatar.cc/80?img=47' },
-    { id: 'u2', name: 'Juan Pérez', email: 'juan.perez@inmoremates.cl', role: 'Gestor de remates', team: 'Gestión', active: true, avatar: 'https://i.pravatar.cc/80?img=12' },
-    { id: 'u3', name: 'Carla Rojas', email: 'carla.rojas@inmoremates.cl', role: 'Responsable de documentación', team: 'Documentación', active: true, avatar: 'https://i.pravatar.cc/80?img=32' },
-    { id: 'u4', name: 'Diego Torres', email: 'diego.torres@inmoremates.cl', role: 'Responsable de participación', team: 'Participación', active: true, avatar: 'https://i.pravatar.cc/80?img=11' },
-    { id: 'u5', name: 'Paula Díaz', email: 'paula.diaz@inmoremates.cl', role: 'Responsable de revisión legal', team: 'Legal', active: false, avatar: 'https://i.pravatar.cc/80?img=44' }
-  ];
+  const T = window.TareasData;
 
   const state = {
-    users: getStoredUsers(),
+    users: T.loadUsers(),
+    tasks: T.tasks(),
     search: '',
     roleFilter: 'all',
     statusFilter: 'all'
@@ -27,18 +20,14 @@
     usersToast: document.getElementById('usersToast')
   };
 
-  function getStoredUsers() {
-    const saved = JSON.parse(localStorage.getItem(USER_STORAGE_KEY) || 'null');
-    if (Array.isArray(saved) && saved.length) return saved;
-    return DEFAULT_USERS;
-  }
-
   function persistUsers() {
-    localStorage.setItem(USER_STORAGE_KEY, JSON.stringify(state.users));
+    T.saveUsers(state.users);
   }
 
-  function getStoredTasks() {
-    return JSON.parse(localStorage.getItem(TASK_STORAGE_KEY) || '[]');
+  function escapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, character => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    }[character]));
   }
 
   function notify(message, type = 'success') {
@@ -47,23 +36,24 @@
     void els.usersToast.offsetWidth;
     els.usersToast.classList.add('show');
     els.usersToast.style.background = type === 'error' ? '#ef1d2d' : '#0b1f44';
-    setTimeout(() => els.usersToast.classList.remove('show'), 2200);
+    clearTimeout(notify.timer);
+    notify.timer = setTimeout(() => els.usersToast.classList.remove('show'), 2200);
   }
 
   function getRoleOptions() {
     return Array.from(new Set(state.users.map(user => user.role))).sort();
   }
 
+  // Usa el mismo criterio de estado que Mis tareas (T.taskState), para que los números coincidan.
   function getTaskSummary(userId) {
-    const tasks = getStoredTasks();
-    return tasks.reduce((summary, task) => {
+    return state.tasks.reduce((summary, task) => {
       if (task.assignedUserId !== userId) return summary;
+      const status = T.taskState(task);
       summary.total += 1;
-      if (task.status === 'completed') summary.completed += 1;
-      if (task.status === 'late' || task.status === 'blocked') summary.pending += 1;
-      if (task.status === 'late') summary.late += 1;
+      if (status !== 'completed') summary.open += 1;
+      if (status === 'late') summary.late += 1;
       return summary;
-    }, { total: 0, pending: 0, completed: 0, late: 0 });
+    }, { total: 0, open: 0, late: 0 });
   }
 
   function renderFilters() {
@@ -111,20 +101,20 @@
               <tr>
                 <td>
                   <div class="user-name">
-                    <img class="user-avatar" src="${user.avatar || 'https://i.pravatar.cc/80?img=47'}" alt="${user.name}">
+                    <img class="user-avatar" src="${escapeHtml(user.avatar || 'https://i.pravatar.cc/80?img=47')}" alt="">
                     <div>
-                      ${user.name}
+                      ${escapeHtml(user.name)}
                     </div>
                   </div>
                 </td>
                 <td>
-                  <span class="user-email">${user.email}</span>
+                  <span class="user-email">${escapeHtml(user.email)}</span>
                 </td>
-                <td><span class="user-role-badge">${user.role}</span></td>
-                <td>${user.team}</td>
+                <td><span class="user-role-badge">${escapeHtml(user.role)}</span></td>
+                <td>${escapeHtml(user.team)}</td>
                 <td><span class="user-status-badge ${user.active ? 'active' : 'inactive'}">${user.active ? 'Activo' : 'Inactivo'}</span></td>
                 <td><span class="user-kpi">${summary.total}<small>total</small></span></td>
-                <td><span class="user-kpi">${summary.pending}<small>pendientes</small></span></td>
+                <td><span class="user-kpi">${summary.open}<small>${summary.late ? `pendientes · ${summary.late} ${summary.late === 1 ? 'atrasada' : 'atrasadas'}` : 'pendientes'}</small></span></td>
                 <td>
                   <div class="user-actions">
                     <button type="button" class="user-action-btn primary" data-user-view="${user.id}">Detalle</button>
@@ -164,21 +154,21 @@
           <div class="user-form-grid">
             <label>
               Nombre completo
-              <input name="name" value="${user.name}" required>
+              <input name="name" value="${escapeHtml(user.name)}" required>
             </label>
             <label>
               Correo electrónico
-              <input name="email" type="email" value="${user.email}" required>
+              <input name="email" type="email" value="${escapeHtml(user.email)}" required>
             </label>
             <label>
               Rol
               <select name="role">
-                ${['Administrador','Gestor de remates','Responsable de documentación','Responsable de participación','Responsable de revisión legal'].map(role => `<option value="${role}" ${role === user.role ? 'selected' : ''}>${role}</option>`).join('')}
+                ${T.ROLES.map(role => `<option value="${role}" ${role === user.role ? 'selected' : ''}>${role}</option>`).join('')}
               </select>
             </label>
             <label>
               Equipo o área
-              <input name="team" value="${user.team}" required>
+              <input name="team" value="${escapeHtml(user.team)}" required>
             </label>
           </div>
           <div class="user-form-actions">
@@ -218,22 +208,25 @@
     document.querySelectorAll('[data-close-user-modal]').forEach(el => el.addEventListener('click', closeUserModal));
   }
 
+  // Las tareas salen del workflow de los remates; reasignar una cambia también el responsable que muestra el tablero.
   function openUserView(userId) {
     const user = state.users.find(item => item.id === userId);
     if (!user) return;
-    const tasks = getStoredTasks().filter(task => task.assignedUserId === userId);
+    const tasks = state.tasks.filter(task => task.assignedUserId === userId);
+    // El usuario actual siempre aparece en la lista, aunque esté inactivo, para que el selector muestre el valor real.
+    const assignable = state.users.filter(u => u.active || u.id === user.id);
     const detail = tasks.length ? tasks.map(task => `
       <li style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;">
         <div>
-          <strong>${task.title}</strong><br>
-          <span>${task.type} · ${task.status}</span>
+          <strong>${escapeHtml(task.title)}</strong><br>
+          <span>${escapeHtml(task.propertyTitle)} · ${T.STATUS_LABEL[task.status]}</span>
         </div>
-        <label style="display:flex;align-items:center;gap:6px;">
+        ${task.status === 'completed' ? '' : `<label style="display:flex;align-items:center;gap:6px;">
           <span style="font-size:12px;color:var(--users-muted);">Reasignar</span>
-          <select data-reassign-task="${task.id}">
-            ${state.users.filter(u => u.active).map(u => `<option value="${u.id}" ${u.id === user.id ? 'selected' : ''}>${u.name}</option>`).join('')}
+          <select data-reassign-task="${escapeHtml(task.id)}">
+            ${assignable.map(u => `<option value="${escapeHtml(u.id)}" ${u.id === user.id ? 'selected' : ''}>${escapeHtml(u.name)}</option>`).join('')}
           </select>
-        </label>
+        </label>`}
       </li>
     `).join('') : '<li>No tiene tareas asignadas.</li>';
     els.userModalContent.innerHTML = `
@@ -241,10 +234,10 @@
         <h2>Detalle del usuario</h2>
         <div class="user-form">
           <div class="user-form-grid">
-            <label>Nombre<input value="${user.name}" readonly></label>
-            <label>Correo<input value="${user.email}" readonly></label>
-            <label>Rol<input value="${user.role}" readonly></label>
-            <label>Equipo<input value="${user.team}" readonly></label>
+            <label>Nombre<input value="${escapeHtml(user.name)}" readonly></label>
+            <label>Correo<input value="${escapeHtml(user.email)}" readonly></label>
+            <label>Rol<input value="${escapeHtml(user.role)}" readonly></label>
+            <label>Equipo<input value="${escapeHtml(user.team)}" readonly></label>
           </div>
           <div>
             <h3 style="margin:0 0 10px;color:var(--users-navy);">Tareas asignadas</h3>
@@ -258,32 +251,47 @@
     `;
     document.querySelectorAll('[data-reassign-task]').forEach(select => {
       select.addEventListener('change', e => {
-        const task = getStoredTasks().find(item => item.id === e.target.dataset.reassignTask);
+        const task = state.tasks.find(item => item.id === e.target.dataset.reassignTask);
         if (!task) return;
-        task.assignedUserId = e.target.value;
-        localStorage.setItem(TASK_STORAGE_KEY, JSON.stringify(getStoredTasks()));
+        T.saveNote(task, { assignedUserId: e.target.value });
         notify('Tarea reasignada correctamente');
         render();
         closeUserModal();
       });
     });
     openUserModal();
-    document.querySelectorAll('[data-close-user-modal]').forEach(el => el.addEventListener('click', closeUserModal));
   }
 
   function toggleUser(userId) {
     const user = state.users.find(item => item.id === userId);
     if (!user) return;
-    if (user.active) {
-      if (!window.confirm('¿Desactivar este usuario? Se conservarán sus tareas existentes.')) return;
-      user.active = false;
-      notify('Usuario desactivado');
-    } else {
+    if (!user.active) {
       user.active = true;
+      persistUsers();
       notify('Usuario activado');
+      render();
+      return;
     }
-    persistUsers();
-    render();
+    // Confirmación propia, igual que el resto de los modales de la maqueta.
+    const open = getTaskSummary(user.id).open;
+    els.userModalContent.innerHTML = `
+      <div class="user-modal-content">
+        <h2>Desactivar usuario</h2>
+        <p class="user-confirm-text">¿Desactivar a <strong>${escapeHtml(user.name)}</strong>? ${open ? `Tiene ${open} ${open === 1 ? 'tarea abierta' : 'tareas abiertas'}: las de los remates donde es gestor o postor quedan a su nombre hasta reasignarlas; las demás pasan a otro usuario activo de su rol.` : 'No tiene tareas abiertas.'}</p>
+        <div class="user-form-actions">
+          <button type="button" class="secondary" data-close-user-modal="true">Cancelar</button>
+          <button type="button" class="primary danger" id="confirmDeactivate">Desactivar</button>
+        </div>
+      </div>
+    `;
+    document.getElementById('confirmDeactivate').addEventListener('click', () => {
+      user.active = false;
+      persistUsers();
+      closeUserModal();
+      notify('Usuario desactivado');
+      render();
+    });
+    openUserModal();
   }
 
   function addNewUser() {
@@ -303,7 +311,7 @@
             <label>
               Rol
               <select name="role">
-                ${['Administrador','Gestor de remates','Responsable de documentación','Responsable de participación','Responsable de revisión legal'].map(role => `<option value="${role}">${role}</option>`).join('')}
+                ${T.ROLES.map(role => `<option value="${role}">${role}</option>`).join('')}
               </select>
             </label>
             <label>
@@ -355,6 +363,7 @@
   }
 
   function render() {
+    state.tasks = T.tasks();
     renderFilters();
     renderTable();
     els.userSearch.value = state.search;

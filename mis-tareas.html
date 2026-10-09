@@ -55,12 +55,19 @@
 
                 <aside class="tasks-aside">
                     <div class="tasks-panel">
-                        <h3>Próximos vencimientos</h3>
+                        <div class="tasks-panel-head">
+                            <h3>Próximos vencimientos</h3>
+                            <button type="button" class="tasks-link" id="upcomingAll">Ver todas</button>
+                        </div>
                         <div id="upcomingList" class="tasks-list-small"></div>
                     </div>
                     <div class="tasks-panel workload-panel">
                         <h3>Mi carga de trabajo</h3>
                         <div id="workloadSummary"></div>
+                    </div>
+                    <div class="tasks-panel">
+                        <h3>Tipos de tareas</h3>
+                        <div id="taskTypes"></div>
                     </div>
                 </aside>
             </div>
@@ -80,6 +87,7 @@
 
     <script src="data.js"></script>
     <script src="shell.js"></script>
+    <script src="tareas-data.js"></script>
     <script src="mis-tareas.js"></script>
 </body>
 
