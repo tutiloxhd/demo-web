@@ -10,24 +10,8 @@
   ];
 
   const demoUsers = getStoredUsers();
-  const taskDefaults = [
-    { id: 'task-101', title: 'Validar documentación', description: 'Revisar el conjunto de documentos del remate y confirmar que estén vigentes y completos antes del envío.', propertyTitle: 'Casa Los Alerces 1450', propertyPlace: 'Las Condes', propertyId: 1, assignedUserId: 'u1', dueDate: '2025-10-13', dueTime: '14:00', priority: 'critical', status: 'late', type: 'Documentación', workflowStage: 9, createdAt: '2025-10-10T09:15:00', completedAt: null, completed: false },
-    { id: 'task-102', title: 'Enviar carta al banco', description: 'Solicitar información al banco para confirmar la disponibilidad y los requisitos del préstamo.', propertyTitle: 'Depto. San Martín 588', propertyPlace: 'Santiago Centro', propertyId: 2, assignedUserId: 'u2', dueDate: '2025-10-14', dueTime: '15:30', priority: 'urgent', status: 'pending', type: 'Financiamiento', workflowStage: 5, createdAt: '2025-10-09T10:00:00', completedAt: null, completed: false },
-    { id: 'task-103', title: 'Preparar sala virtual', description: 'Conectar la sala virtual y validar que el equipo de participación esté listo.', propertyTitle: 'Casa El Roble 972', propertyPlace: 'Ñuñoa', propertyId: 3, assignedUserId: 'u3', dueDate: '2025-10-15', dueTime: '11:30', priority: 'urgent', status: 'in_progress', type: 'Participación', workflowStage: 13, createdAt: '2025-10-09T08:40:00', completedAt: null, completed: false },
-    { id: 'task-104', title: 'Revisar formulario de postulación', description: 'Confirmar que los datos del formulario coinciden con la documentación adjunta y con la oferta.', propertyTitle: 'Casa Valle Alegre 321', propertyPlace: 'La Florida', propertyId: 4, assignedUserId: 'u4', dueDate: '2025-10-15', dueTime: '16:00', priority: 'upcoming', status: 'pending', type: 'Participación', workflowStage: 6, createdAt: '2025-10-08T12:00:00', completedAt: null, completed: false },
-    { id: 'task-105', title: 'Actualizar cartera de garantías', description: 'Registrar los montos vigentes de la garantía y su estado financiero.', propertyTitle: 'Depto. Parque 1234', propertyPlace: 'Providencia', propertyId: 5, assignedUserId: 'u2', dueDate: '2025-10-17', dueTime: '10:00', priority: 'normal', status: 'completed', type: 'Garantías', workflowStage: 12, createdAt: '2025-10-07T09:45:00', completedAt: '2025-10-16T12:00:00', completed: true },
-    { id: 'task-106', title: 'Revisión legal final', description: 'Cargar el informe final de legal y confirmar que no quedan observaciones pendientes.', propertyTitle: 'Casa Mirador 777', propertyPlace: 'Peñalolén', propertyId: 6, assignedUserId: 'u5', dueDate: '2025-10-16', dueTime: '14:30', priority: 'urgent', status: 'blocked', type: 'Legal', workflowStage: 11, createdAt: '2025-10-06T11:00:00', completedAt: null, completed: false },
-    { id: 'task-107', title: 'Verificar disponibilidad de título', description: 'Solicitar y validar la documentación de dominio antes del remate.', propertyTitle: 'Terreno El Arrayán', propertyPlace: 'Lo Barnechea', propertyId: 7, assignedUserId: 'u1', dueDate: '2025-10-17', dueTime: '12:00', priority: 'upcoming', status: 'pending', type: 'Legal', workflowStage: 12, createdAt: '2025-10-07T15:30:00', completedAt: null, completed: false },
-    { id: 'task-108', title: 'Revisión de antecedentes', description: 'Revisar y confirmar antecedentes del vehículo y del propietario para la operación.', propertyTitle: 'Casa Los Hualtatas 5210', propertyPlace: 'Vitacura', propertyId: 8, assignedUserId: 'u3', dueDate: '2025-10-14', dueTime: '11:00', priority: 'normal', status: 'blocked', type: 'Legal', workflowStage: 7, createdAt: '2025-10-05T08:10:00', completedAt: null, completed: false },
-    { id: 'task-109', title: 'Actualizar entrada de evento', description: 'Confirmar la participación con la sala y documentar el acceso del equipo.', propertyTitle: 'Depto. Los Leones 890', propertyPlace: 'Providencia', propertyId: 9, assignedUserId: 'u4', dueDate: '2025-10-17', dueTime: '09:30', priority: 'normal', status: 'pending', type: 'Participación', workflowStage: 11, createdAt: '2025-10-08T11:00:00', completedAt: null, completed: false },
-    { id: 'task-110', title: 'Solicitar Vale Vista', description: 'Actualizar la solicitud de Vale Vista para la venta pública del inmueble.', propertyTitle: 'Casa Los Trapenses 2140', propertyPlace: 'Lo Barnechea', propertyId: 10, assignedUserId: 'u2', dueDate: '2025-10-20', dueTime: '10:30', priority: 'upcoming', status: 'pending', type: 'Documentación', workflowStage: 3, createdAt: '2025-10-08T16:00:00', completedAt: null, completed: false },
-    { id: 'task-111', title: 'Revisar carta al banco', description: 'Confirmar la recepción de la carta y su contenido para la próxima semana.', propertyTitle: 'Depto. Irarrázaval 3050', propertyPlace: 'Ñuñoa', propertyId: 11, assignedUserId: 'u1', dueDate: '2025-10-21', dueTime: '12:00', priority: 'urgent', status: 'pending', type: 'Financiamiento', workflowStage: 5, createdAt: '2025-10-10T07:30:00', completedAt: null, completed: false },
-    { id: 'task-112', title: 'Preparar asignación de gestor', description: 'Validar la asignación del gestor y del postor para la próxima subasta.', propertyTitle: 'Casa Camino El Alba 9120', propertyPlace: 'Las Condes', propertyId: 12, assignedUserId: 'u2', dueDate: '2025-10-22', dueTime: '09:00', priority: 'critical', status: 'late', type: 'Gestión', workflowStage: 2, createdAt: '2025-10-09T10:55:00', completedAt: null, completed: false },
-    { id: 'task-113', title: 'Confirmar requerimientos de formulario', description: 'Verificar que la información del formulario sea consistente con la documentación entregada.', propertyTitle: 'Parcela Chicureo 18', propertyPlace: 'Colina', propertyId: 13, assignedUserId: 'u3', dueDate: '2025-10-22', dueTime: '15:00', priority: 'upcoming', status: 'pending', type: 'Participación', workflowStage: 6, createdAt: '2025-10-08T09:15:00', completedAt: null, completed: false },
-    { id: 'task-114', title: 'Coordinar revisión legal', description: 'Revisar la revisión legal y dar continuidad a la próxima etapa.', propertyTitle: 'Depto. Av. Matta 455', propertyPlace: 'Santiago Centro', propertyId: 14, assignedUserId: 'u5', dueDate: '2025-10-23', dueTime: '11:00', priority: 'normal', status: 'completed', type: 'Legal', workflowStage: 4, createdAt: '2025-10-03T15:00:00', completedAt: '2025-10-21T11:00:00', completed: true },
-    { id: 'task-115', title: 'Validar entrega del expediente', description: 'Verificar que todas las piezas del expediente estén disponibles para la revisión.', propertyTitle: 'Casa Los Dominicos 730', propertyPlace: 'Las Condes', propertyId: 15, assignedUserId: 'u4', dueDate: '2025-10-24', dueTime: '16:30', priority: 'urgent', status: 'pending', type: 'Documentación', workflowStage: 7, createdAt: '2025-10-11T12:00:00', completedAt: null, completed: false },
-    { id: 'task-116', title: 'Seguimiento de adjudicación', description: 'Revisar el cierre del proceso y responder las solicitudes pendientes del cliente.', propertyTitle: 'Casa Pedro de Valdivia 2480', propertyPlace: 'Providencia', propertyId: 16, assignedUserId: 'u1', dueDate: '2025-10-06', dueTime: '10:00', priority: 'normal', status: 'completed', type: 'Cierre', workflowStage: 16, createdAt: '2025-10-05T09:00:00', completedAt: '2025-10-06T12:00:00', completed: true }
-  ];
+  const taskDefaults = window.InmoRematesTaskDefaults;
+  if (!Array.isArray(taskDefaults)) throw new Error('No se cargaron los datos compartidos de tareas.');
 
   const state = {
     users: demoUsers,
@@ -69,6 +53,16 @@
     upcoming: { label: 'Próxima', className: 'upcoming' },
     normal: { label: 'Normal', className: 'normal' }
   };
+  const DEMO_NOW = new Date('2025-10-16T18:00:00');
+  const DEMO_TODAY = '2025-10-16';
+  const DEMO_WEEK = window.RematesData?.weekRange(0) || { from: '2025-10-13', to: '2025-10-19' };
+  const WORKFLOW_TASK_CODES = new Set([
+    'CREAR_WORKFLOW', 'ASIGNAR_RESPONSABLES', 'GENERAR_CARTA', 'ENVIAR_CARTA_GG',
+    'ENVIAR_CARTA_BANCO', 'GENERAR_FORMULARIO', 'LEGAL_PRE_ENTREGA', 'RETIRAR_VV',
+    'ENTREGAR_JUZGADO', 'REGISTRAR_EVIDENCIA', 'LEGAL_FINAL', 'PREPARAR_PARTICIPACION',
+    'INGRESAR_SALA', 'PARTICIPAR', 'REGISTRAR_RESULTADO', 'GESTIONAR_PAGO',
+    'MARCAR_ADJUDICADA', 'RECUPERAR_GARANTIA', 'REGISTRAR_GARANTIA', 'ACTUALIZAR_FECHA'
+  ]);
 
   function getStoredUsers() {
     const saved = JSON.parse(localStorage.getItem(USER_STORAGE_KEY) || 'null');
@@ -78,6 +72,7 @@
   function getStoredTasks() {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
     if (Array.isArray(saved) && saved.length) return saved;
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(taskDefaults));
     return taskDefaults;
   }
 
@@ -107,44 +102,117 @@
   function formatDate(dateString, timeString) {
     if (!dateString) return 'Sin fecha';
     const date = new Date(`${dateString}T${timeString || '00:00'}:00`);
+    if (Number.isNaN(date.getTime())) return 'Sin fecha';
     const formatter = new Intl.DateTimeFormat('es-CL', { day: '2-digit', month: 'short', year: 'numeric' });
     const time = timeString ? new Intl.DateTimeFormat('es-CL', { hour: '2-digit', minute: '2-digit', hour12: false }).format(date) : '';
     return `${formatter.format(date)}${time ? ' · ' + time : ''}`;
+  }
+
+  function formatDueRelative(due) {
+    const minutes = Math.ceil(Math.abs(due.getTime() - DEMO_NOW.getTime()) / 60000);
+    const amount = minutes < 60
+      ? `${minutes} min`
+      : minutes < 1440
+        ? `${Math.ceil(minutes / 60)} h`
+        : `${Math.ceil(minutes / 1440)} d`;
+    return due < DEMO_NOW ? `Venció hace ${amount}` : `Vence en ${amount}`;
+  }
+
+  function formatUpcomingDate(task) {
+    if (task.dueDate === DEMO_TODAY) return `Hoy · ${task.dueTime || 'hora pendiente'}`;
+    const tomorrow = new Date(`${DEMO_TODAY}T00:00:00`);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    const tomorrowDate = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, '0')}-${String(tomorrow.getDate()).padStart(2, '0')}`;
+    if (task.dueDate === tomorrowDate) return `Mañana · ${task.dueTime || 'hora pendiente'}`;
+    return formatDate(task.dueDate, task.dueTime);
   }
 
   function getUserById(userId) {
     return state.users.find(user => user.id === userId) || { name: 'Sin asignación', email: '', role: 'Sin rol', team: 'Sin área', active: true };
   }
 
+  function getTaskDue(task) {
+    if (!task.dueDate) return null;
+    const due = new Date(`${task.dueDate}T${task.dueTime || '00:00'}:00`);
+    return Number.isNaN(due.getTime()) ? null : due;
+  }
+
+  function getResponsibleUserId(task) {
+    return task.assignedUserId || task.responsibleUserId || '';
+  }
+
+  function getSubstituteUserId(task) {
+    return task.substituteUserId || task.backupUserId || '';
+  }
+
+  function getWorkflowTaskCode(task) {
+    const code = task.workflowTaskCode || task.taskCode || task.code;
+    return WORKFLOW_TASK_CODES.has(code) ? code : '';
+  }
+
+  function isTaskAssignedTo(task, userId) {
+    return getResponsibleUserId(task) === userId || getSubstituteUserId(task) === userId;
+  }
+
+  function getRelatedProperty(task) {
+    return window.RematesData?.items.find(item => item.id === Number(task.propertyId)) || null;
+  }
+
   function getTaskState(task) {
-    const taskDate = new Date(`${task.dueDate}T${task.dueTime || '00:00'}:00`);
-    const now = new Date('2025-10-16T18:00:00');
-    const isLate = task.status !== 'completed' && task.status !== 'blocked' && taskDate.getTime() < now.getTime();
     if (task.status === 'completed') return 'completed';
     if (task.status === 'blocked') return 'blocked';
-    if (isLate) return 'late';
+    const due = getTaskDue(task);
+    if (due && due < DEMO_NOW) return 'late';
     if (task.status === 'in_progress') return 'in_progress';
     return 'pending';
   }
 
+  function isTaskOverdue(task) {
+    const due = getTaskDue(task);
+    return task.status !== 'completed' && Boolean(due && due < DEMO_NOW);
+  }
+
+  function getTaskCategory(task) {
+    if (task.status === 'completed') return 'completed';
+    if (isTaskOverdue(task)) return 'late';
+    if (task.priority === 'critical') return 'critical';
+    if (task.dueDate === DEMO_TODAY) return 'today';
+    const due = getTaskDue(task);
+    if (due && due >= new Date(`${DEMO_WEEK.from}T00:00:00`) && due <= new Date(`${DEMO_WEEK.to}T23:59:59`)) return 'week';
+    if (due) return due > DEMO_NOW ? 'later' : 'unscheduled';
+    return 'unscheduled';
+  }
+
   function normalizeTask(task) {
-    const status = getTaskState(task);
-    return { ...task, status };
+    const property = getRelatedProperty(task);
+    return {
+      ...task,
+      status: getTaskState(task),
+      propertyTitle: property?.title || task.propertyTitle,
+      propertyPlace: property?.place || task.propertyPlace
+    };
   }
 
   function activeUserTasks() {
     return state.tasks
       .map(normalizeTask)
-      .filter(task => task.assignedUserId === state.activeUserId && task.status !== 'completed' ? true : task.assignedUserId === state.activeUserId);
+      .filter(task => isTaskAssignedTo(task, state.activeUserId));
   }
 
   function filterTasks(tasks) {
     const search = state.search.trim().toLowerCase();
     return tasks.filter(task => {
-      const user = getUserById(task.assignedUserId);
-      const haystack = [task.title, task.propertyTitle, task.propertyPlace, user.name, task.type, task.status].join(' ').toLowerCase();
+      const property = getRelatedProperty(task);
+      const user = getUserById(getResponsibleUserId(task));
+      const substitute = getUserById(getSubstituteUserId(task));
+      const haystack = [
+        task.title, task.propertyTitle, task.propertyPlace, property?.stage,
+        property?.person, user.name, substitute.name, task.type, task.status, task.priority
+      ].join(' ').toLowerCase();
       const matchesSearch = !search || haystack.includes(search);
-      const matchesQuick = state.quickFilter === 'all' || filterByQuick(task, state.quickFilter);
+      const matchesQuick = state.quickFilter === 'all'
+        ? task.status !== 'completed' || state.statusFilter === 'completed'
+        : filterByQuick(task, state.quickFilter);
       const matchesStatus = state.statusFilter === 'all' || task.status === state.statusFilter;
       const matchesType = state.typeFilter === 'all' || task.type === state.typeFilter;
       return matchesSearch && matchesQuick && matchesStatus && matchesType;
@@ -152,32 +220,28 @@
   }
 
   function filterByQuick(task, key) {
-    const now = new Date('2025-10-16T18:00:00');
-    const due = new Date(`${task.dueDate}T${task.dueTime || '00:00'}:00`);
+    const category = getTaskCategory(task);
     switch (key) {
       case 'today':
-        return task.dueDate === '2025-10-16';
+        return task.status !== 'completed' && task.dueDate === DEMO_TODAY && !isTaskOverdue(task);
       case 'late':
-        return task.status === 'late';
+        return category === 'late';
       case 'week':
-        return due.getTime() <= new Date('2025-10-22T23:59:59').getTime() && due.getTime() >= new Date('2025-10-13T00:00:00').getTime();
+        return category === 'week';
       case 'completed':
-        return task.status === 'completed';
+        return category === 'completed';
       default:
-        return true;
+        return task.status !== 'completed';
     }
   }
 
   function updateMetrics(tasks) {
-    const active = tasks.filter(task => task.assignedUserId === state.activeUserId);
+    const active = tasks.filter(task => task.status !== 'completed');
     const metrics = [
-      { key: 'all', label: 'Tareas activas', icon: 'flag', className: 'blue', value: active.filter(t => t.status !== 'completed').length },
-      { key: 'late', label: 'Tareas atrasadas', icon: 'clock', className: 'red', value: active.filter(t => t.status === 'late').length },
-      { key: 'today', label: 'Vencen hoy', icon: 'alert', className: 'amber', value: active.filter(t => t.dueDate === '2025-10-16').length },
-      { key: 'week', label: 'Vencen esta semana', icon: 'calendar', className: 'green', value: active.filter(t => {
-        const due = new Date(`${t.dueDate}T${t.dueTime || '00:00'}:00`);
-        return due >= new Date('2025-10-13T00:00:00') && due <= new Date('2025-10-22T23:59:59');
-      }).length }
+      { key: 'all', label: 'Tareas activas', icon: 'flag', className: 'blue', value: active.length },
+      { key: 'late', label: 'Tareas atrasadas', icon: 'clock', className: 'red', value: active.filter(t => getTaskCategory(t) === 'late').length },
+      { key: 'today', label: 'Vencen hoy', icon: 'alert', className: 'amber', value: active.filter(t => t.dueDate === DEMO_TODAY && !isTaskOverdue(t)).length },
+      { key: 'week', label: 'Esta semana', icon: 'calendar', className: 'green', value: active.filter(t => getTaskCategory(t) === 'week').length }
     ];
 
     els.metrics.innerHTML = metrics.map(metric => `
@@ -201,18 +265,19 @@
 
   function buildGroups(tasks) {
     const groups = [
-      { key: 'late', title: 'Tareas atrasadas', predicate: task => task.status === 'late' },
-      { key: 'critical', title: 'Tareas críticas', predicate: task => task.priority === 'critical' && task.status !== 'completed' },
-      { key: 'today', title: 'Tareas próximas / hoy', predicate: task => task.dueDate === '2025-10-16' && task.status !== 'completed' },
-      { key: 'week', title: 'Tareas de esta semana', predicate: task => {
-        const due = new Date(`${task.dueDate}T${task.dueTime || '00:00'}:00`);
-        return task.status !== 'completed' && due >= new Date('2025-10-13T00:00:00') && due <= new Date('2025-10-22T23:59:59');
-      } },
-      { key: 'completed', title: 'Tareas completadas', predicate: task => task.status === 'completed' }
+      { key: 'late', title: 'Tareas atrasadas' },
+      { key: 'critical', title: 'Tareas críticas' },
+      { key: 'today', title: 'Tareas próximas / Hoy' },
+      { key: 'week', title: 'Tareas de esta semana' },
+      { key: 'later', title: 'Tareas posteriores' },
+      { key: 'unscheduled', title: 'Tareas sin vencimiento' },
+      { key: 'completed', title: 'Tareas completadas' }
     ];
 
     const html = groups.map(group => {
-      const items = tasks.filter(group.predicate);
+      const items = tasks
+        .filter(task => getTaskCategory(task) === group.key)
+        .sort((a, b) => (getTaskDue(a)?.getTime() ?? Infinity) - (getTaskDue(b)?.getTime() ?? Infinity));
       if (!items.length) return '';
       return `
         <section class="task-group">
@@ -231,29 +296,35 @@
   }
 
   function renderTaskItem(task) {
-    const user = getUserById(task.assignedUserId);
+    const responsible = getUserById(getResponsibleUserId(task));
+    const substituteId = getSubstituteUserId(task);
+    const substitute = substituteId ? getUserById(substituteId) : null;
+    const due = getTaskDue(task);
+    const isLate = isTaskOverdue(task);
+    const workflowLinked = Boolean(getWorkflowTaskCode(task));
+    const propertyLink = task.propertyId
+      ? `<a class="task-property-link" href="hello.html?id=${encodeURIComponent(task.propertyId)}">${escapeHtml(task.propertyTitle || 'Remate')}</a>`
+      : escapeHtml(task.propertyTitle || 'Remate sin vincular');
     return `
       <div class="task-item">
-        <input class="task-checkbox" type="checkbox" data-task-check="${task.id}" ${task.status === 'completed' ? 'checked' : ''}>
+        <input class="task-checkbox" type="checkbox" data-task-check="${escapeHtml(task.id)}" ${task.status === 'completed' ? 'checked' : ''} ${workflowLinked ? 'disabled title="Gestiona esta etapa desde Workflow"' : ''}>
         <div class="task-main">
-          <span class="task-title">${task.title}</span>
-          <span class="task-property">${task.propertyTitle} · ${task.propertyPlace}</span>
-        </div>
-        <div class="task-meta">
-          <strong>Ubicación</strong>
-          ${task.propertyPlace}
+          <span class="task-title">${escapeHtml(task.title)}</span>
+          <span class="task-property">${propertyLink} · ${escapeHtml(task.propertyPlace || 'Ubicación no disponible')}</span>
         </div>
         <div class="task-meta">
           <strong>Vencimiento</strong>
           ${formatDate(task.dueDate, task.dueTime)}
+          <small class="task-due-relative ${isLate ? 'is-late' : ''}">${due ? formatDueRelative(due) : 'Sin vencimiento'}</small>
         </div>
         <div class="task-meta">
           <strong>Responsable</strong>
-          ${user.name}
+          ${escapeHtml(responsible.name)}
+          ${substitute ? `<small class="task-substitute">Suplente: ${escapeHtml(substitute.name)}</small>` : ''}
         </div>
-        <div class="task-type">${task.type}</div>
-        <div class="task-status ${statusMeta[task.status]?.label ? task.status : 'pending'}">${statusMeta[task.status]?.label || 'Pendiente'}</div>
-        <div class="task-priority ${priorityMeta[task.priority]?.className || 'normal'}">${priorityMeta[task.priority]?.label || 'Normal'}</div>
+        <div class="task-type">${escapeHtml(task.type || 'Sin tipo')}</div>
+        <div class="task-status ${statusMeta[task.status]?.label ? task.status : 'pending'}">${escapeHtml(statusMeta[task.status]?.label || 'Pendiente')}</div>
+        <div class="task-priority ${priorityMeta[task.priority]?.className || 'normal'}">${escapeHtml(priorityMeta[task.priority]?.label || 'Normal')}</div>
         <div class="task-actions">
           <button type="button" class="task-open-btn" data-open-task="${task.id}">Abrir tarea</button>
           <button type="button" class="task-action-menu" data-open-task="${task.id}" aria-label="Más acciones">⋯</button>
@@ -263,10 +334,10 @@
   }
 
   function renderUpcoming() {
-    const items = state.tasks
+    const items = activeUserTasks()
       .map(normalizeTask)
-      .filter(task => task.assignedUserId === state.activeUserId && task.status !== 'completed')
-      .sort((a, b) => new Date(`${a.dueDate}T${a.dueTime || '00:00'}:00`) - new Date(`${b.dueDate}T${b.dueTime || '00:00'}:00`))
+      .filter(task => task.status !== 'completed' && getTaskDue(task) >= DEMO_NOW)
+      .sort((a, b) => getTaskDue(a) - getTaskDue(b))
       .slice(0, 4);
 
     if (!items.length) {
@@ -275,46 +346,60 @@
     }
 
     els.upcomingList.innerHTML = items.map(task => `
-      <div class="task-mini-item" data-open-task="${task.id}">
+      <button type="button" class="task-mini-item" data-open-task="${escapeHtml(task.id)}">
         <span class="icon-wrap"><svg class="icon"><use href="#clock" /></svg></span>
         <div>
-          <strong>${task.title}</strong>
-          <small>${task.propertyTitle}</small>
-          <small>${task.dueTime} · ${task.priority}</small>
+          <strong>${escapeHtml(formatUpcomingDate(task))}</strong>
+          <span>${escapeHtml(task.title)}</span>
+          <small>${escapeHtml(task.propertyTitle || 'Remate no disponible')}</small>
         </div>
-        <span class="task-priority ${priorityMeta[task.priority]?.className || 'normal'} priority-pill">${priorityMeta[task.priority]?.label || 'Normal'}</span>
-      </div>
+        <span class="task-priority ${priorityMeta[task.priority]?.className || 'normal'} priority-pill">${escapeHtml(priorityMeta[task.priority]?.label || 'Normal')}</span>
+      </button>
     `).join('');
   }
 
   function renderWorkload() {
-    const tasks = state.tasks.filter(task => task.assignedUserId === state.activeUserId);
+    const tasks = activeUserTasks();
+    const openTasks = tasks.filter(task => task.status !== 'completed');
     const totals = {
       pending: tasks.filter(task => task.status === 'pending').length,
       in_progress: tasks.filter(task => task.status === 'in_progress').length,
       completed: tasks.filter(task => task.status === 'completed').length,
-      late: tasks.filter(task => task.status === 'late').length,
       blocked: tasks.filter(task => task.status === 'blocked').length
     };
     const total = tasks.length || 1;
-    const rows = [
+    const statusRows = [
       { label: 'Pendientes', value: totals.pending, color: '#1268f3' },
       { label: 'En curso', value: totals.in_progress, color: '#6b43d6' },
+      { label: 'Atrasadas', value: tasks.filter(task => task.status === 'late').length, color: '#ef1d2d' },
       { label: 'Completadas', value: totals.completed, color: '#078b43' },
-      { label: 'Atrasadas', value: totals.late, color: '#ef1d2d' },
       { label: 'Bloqueadas', value: totals.blocked, color: '#57657d' }
+    ];
+    const dueRows = [
+      { label: 'Atrasadas', value: openTasks.filter(task => getTaskCategory(task) === 'late').length, color: '#ef1d2d' },
+      { label: 'Vencen hoy', value: openTasks.filter(task => task.dueDate === DEMO_TODAY && !isTaskOverdue(task)).length, color: '#f0a900' },
+      { label: 'Esta semana', value: openTasks.filter(task => getTaskCategory(task) === 'week').length, color: '#1268f3' }
     ];
 
     const typeCounts = Object.entries(
       tasks.reduce((acc, task) => {
-        acc[task.type] = (acc[task.type] || 0) + 1;
+        const type = task.type || 'Sin tipo';
+        acc[type] = (acc[type] || 0) + 1;
         return acc;
       }, {})
-    );
+    ).sort(([a], [b]) => a.localeCompare(b, 'es'));
+
+    const renderRows = rows => rows.map(row => `
+      <div class="workload-row">
+        <span>${escapeHtml(row.label)}</span>
+        <div class="bar-track"><span class="bar-fill" style="width:${(row.value / total) * 100}%;background:${row.color};"></span></div>
+        <strong>${row.value}</strong>
+      </div>
+    `).join('');
 
     const typeHtml = typeCounts.length ? typeCounts.map(([label, count]) => `
       <div class="workload-row">
-        <span>${label}</span>
+        <span>${escapeHtml(label)}</span>
         <div class="bar-track"><span class="bar-fill" style="width:${(count / total) * 100}%;"></span></div>
         <strong>${count}</strong>
       </div>
@@ -327,16 +412,13 @@
           <strong>${tasks.length}</strong>
         </div>
         <div class="workload-bars">
-          ${rows.map(row => `
-            <div class="workload-row">
-              <span>${row.label}</span>
-              <div class="bar-track"><span class="bar-fill" style="width:${(row.value / total) * 100}%;background:${row.color};"></span></div>
-              <strong>${row.value}</strong>
-            </div>
-          `).join('')}
+          <h4>Por estado</h4>
+          ${renderRows(statusRows)}
+          <h4>Por vencimiento</h4>
+          ${renderRows(dueRows)}
         </div>
         <div>
-          <h4 style="margin:0 0 10px;color:var(--task-navy);">Distribución por tipo</h4>
+          <h4 class="workload-subheading">Tipos de tareas</h4>
           ${typeHtml}
         </div>
       </div>
@@ -345,7 +427,9 @@
 
   function renderFilters() {
     const statusOptions = Object.entries(statusMeta).map(([value, meta]) => `<option value="${value}">${meta.label}</option>`).join('');
-    const typeOptions = Array.from(new Set(state.tasks.map(task => task.type))).map(type => `<option value="${type}">${type}</option>`).join('');
+    const typeOptions = Array.from(new Set(state.tasks.map(task => task.type).filter(Boolean)))
+      .sort((a, b) => a.localeCompare(b, 'es'))
+      .map(type => `<option value="${escapeHtml(type)}">${escapeHtml(type)}</option>`).join('');
     els.taskStatusFilter.innerHTML = `<option value="all">Estado: todos</option>${statusOptions}`;
     els.taskTypeFilter.innerHTML = `<option value="all">Tipo: todos</option>${typeOptions}`;
     els.taskStatusFilter.value = state.statusFilter;
@@ -360,13 +444,20 @@
     ];
     els.quickFilters.innerHTML = quick.map(filter => `
       <button type="button" class="task-quick-filter ${state.quickFilter === filter.key ? 'active' : ''}" data-quick="${filter.key}">${filter.label}</button>
-    `).join('') + '<button type="button" class="task-quick-filter clear" data-quick="all">Restablecer</button>';
+    `).join('') + '<button type="button" class="task-quick-filter clear" data-reset-filters="true">Restablecer</button>';
 
     els.quickFilters.querySelectorAll('[data-quick]').forEach(button => {
       button.addEventListener('click', () => {
         state.quickFilter = button.dataset.quick || 'all';
         render();
       });
+    });
+    els.quickFilters.querySelector('[data-reset-filters]').addEventListener('click', () => {
+      state.quickFilter = 'all';
+      state.statusFilter = 'all';
+      state.typeFilter = 'all';
+      state.search = '';
+      render();
     });
     els.taskStatusFilter.onchange = e => {
       state.statusFilter = e.target.value;
@@ -384,7 +475,7 @@
     if (!activeUsers.some(user => user.id === state.activeUserId) && fallbackUserId) {
       state.activeUserId = fallbackUserId;
     }
-    els.activeUserSelect.innerHTML = activeUsers.map(user => `<option value="${user.id}">${user.name}</option>`).join('');
+    els.activeUserSelect.innerHTML = activeUsers.map(user => `<option value="${escapeHtml(user.id)}">${escapeHtml(user.name)}</option>`).join('');
     els.activeUserSelect.value = state.activeUserId;
     els.activeUserSelect.onchange = e => {
       state.activeUserId = e.target.value;
@@ -394,8 +485,7 @@
   }
 
   function render() {
-    const normalizedTasks = state.tasks.map(normalizeTask);
-    const userTasks = normalizedTasks.filter(task => task.assignedUserId === state.activeUserId);
+    const userTasks = activeUserTasks();
     const filtered = filterTasks(userTasks);
     renderUserSelect();
     renderFilters();
@@ -410,14 +500,15 @@
       render();
     };
 
-    document.querySelectorAll('[data-open-task]').forEach(button => {
-      button.addEventListener('click', () => openTaskModal(button.dataset.openTask));
-    });
-
     document.querySelectorAll('[data-task-check]').forEach(checkbox => {
       checkbox.addEventListener('change', e => {
         const task = state.tasks.find(item => item.id === checkbox.dataset.taskCheck);
         if (!task) return;
+        if (getWorkflowTaskCode(task)) {
+          notify('Completa esta etapa desde Workflow para respetar sus dependencias.', 'error');
+          checkbox.checked = task.status === 'completed';
+          return;
+        }
         if (task.status === 'blocked') {
           notify('Debe resolver el bloqueo antes de completar esta tarea.', 'error');
           checkbox.checked = false;
@@ -435,19 +526,25 @@
   }
 
   function openTaskModal(taskId) {
-    const task = state.tasks.find(item => item.id === taskId);
-    if (!task) return;
-    if (task.workflowStage === 3 || /carta vale vista/i.test(task.title)) {
-      openValeVistaModal(task);
+    const taskRecord = state.tasks.find(item => item.id === taskId);
+    if (!taskRecord) return;
+    const workflowCode = getWorkflowTaskCode(taskRecord);
+    if (workflowCode === 'GENERAR_CARTA') {
+      openValeVistaModal(taskRecord);
       return;
     }
-    if (task.workflowStage === 2 || /asignar gestor y postor/i.test(task.title)) {
-      openAssignmentModal(task);
+    if (workflowCode === 'ASIGNAR_RESPONSABLES') {
+      openAssignmentModal(taskRecord);
+      return;
+    }
+    if (workflowCode) {
+      openWorkflowTaskNotice(taskRecord, workflowCode);
       return;
     }
 
+    const task = normalizeTask(taskRecord);
     els.taskModal.querySelector('.task-modal-dialog').className = 'task-modal-dialog';
-    const user = getUserById(task.assignedUserId);
+    const user = getUserById(getResponsibleUserId(task));
     const status = statusMeta[task.status]?.label || 'Pendiente';
     const priority = priorityMeta[task.priority]?.label || 'Normal';
     els.taskModalContent.innerHTML = `
@@ -493,6 +590,7 @@
               <select name="status">
                 <option value="pending" ${task.status === 'pending' ? 'selected' : ''}>Pendiente</option>
                 <option value="in_progress" ${task.status === 'in_progress' ? 'selected' : ''}>En curso</option>
+                <option value="late" ${task.status === 'late' ? 'selected' : ''}>Atrasada</option>
                 <option value="blocked" ${task.status === 'blocked' ? 'selected' : ''}>Bloqueada</option>
                 <option value="completed" ${task.status === 'completed' ? 'selected' : ''}>Completada</option>
               </select>
@@ -512,7 +610,14 @@
             <label>
               Responsable
               <select name="assignedUserId">
-                ${state.users.filter(user => user.active).map(user => `<option value="${user.id}" ${user.id === task.assignedUserId ? 'selected' : ''}>${user.name}</option>`).join('')}
+                ${state.users.filter(user => user.active).map(user => `<option value="${escapeHtml(user.id)}" ${user.id === getResponsibleUserId(task) ? 'selected' : ''}>${escapeHtml(user.name)}</option>`).join('')}
+              </select>
+            </label>
+            <label>
+              Suplente (opcional)
+              <select name="substituteUserId">
+                <option value="">Sin suplente</option>
+                ${state.users.filter(user => user.active).map(user => `<option value="${escapeHtml(user.id)}" ${user.id === getSubstituteUserId(task) ? 'selected' : ''}>${escapeHtml(user.name)}</option>`).join('')}
               </select>
             </label>
             <label>
@@ -555,6 +660,7 @@
         status: formData.get('status'),
         priority: formData.get('priority'),
         assignedUserId: formData.get('assignedUserId'),
+        substituteUserId: formData.get('substituteUserId') || '',
         type: formData.get('type'),
         dueDate: formData.get('dueDate'),
         dueTime: formData.get('dueTime'),
@@ -566,13 +672,13 @@
         return;
       }
 
-      Object.assign(task, updates);
+      Object.assign(taskRecord, updates);
       if (updates.status === 'completed') {
-        task.completedAt = new Date().toISOString();
-        task.completed = true;
+        taskRecord.completedAt = new Date().toISOString();
+        taskRecord.completed = true;
       } else {
-        task.completed = false;
-        task.completedAt = null;
+        taskRecord.completed = false;
+        taskRecord.completedAt = null;
       }
       persistTasks();
       notify('Tarea guardada con éxito');
@@ -587,10 +693,6 @@
     return String(value ?? '').replace(/[&<>"']/g, character => ({
       '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
     }[character]));
-  }
-
-  function getRelatedProperty(task) {
-    return window.RematesData?.items.find(item => item.id === Number(task.propertyId)) || null;
   }
 
   function taskPropertySummary(task) {
@@ -625,6 +727,31 @@
         </div>
       </div>
     `;
+  }
+
+  function openWorkflowTaskNotice(task, workflowCode) {
+    const remateLink = task.propertyId
+      ? `<a class="workflow-task-link" href="hello.html?id=${encodeURIComponent(task.propertyId)}">Abrir remate en Workflow</a>`
+      : '<span>Remate asociado no disponible.</span>';
+    els.taskModalContent.innerHTML = `
+      <div class="task-modal-body">
+        <header class="task-modal-header">
+          <div>
+            <h3>${escapeHtml(task.title)}</h3>
+            <span class="task-type">${escapeHtml(workflowCode)}</span>
+          </div>
+        </header>
+        ${renderPropertySummary(task)}
+        <div class="workflow-task-notice" role="status">
+          El estado y las dependencias de esta tarea se gestionan desde Workflow. No se modificarán desde Mis tareas.
+        </div>
+        <div class="task-modal-actions">
+          ${remateLink}
+          <button type="button" class="secondary-action" data-close-task-modal="true">Cerrar</button>
+        </div>
+      </div>
+    `;
+    showTaskModal();
   }
 
   function showTaskModal(modalClass = '') {

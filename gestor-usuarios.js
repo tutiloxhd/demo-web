@@ -38,7 +38,14 @@
   }
 
   function getStoredTasks() {
-    return JSON.parse(localStorage.getItem(TASK_STORAGE_KEY) || '[]');
+    const saved = JSON.parse(localStorage.getItem(TASK_STORAGE_KEY) || 'null');
+    if (Array.isArray(saved) && saved.length) return saved;
+    if (!Array.isArray(window.InmoRematesTaskDefaults)) {
+      throw new Error('No se cargaron los datos compartidos de tareas.');
+    }
+    const defaults = JSON.parse(JSON.stringify(window.InmoRematesTaskDefaults));
+    localStorage.setItem(TASK_STORAGE_KEY, JSON.stringify(defaults));
+    return defaults;
   }
 
   function notify(message, type = 'success') {
@@ -54,14 +61,37 @@
     return Array.from(new Set(state.users.map(user => user.role))).sort();
   }
 
+  function isTaskAssignedTo(task, userId) {
+    const responsibleId = task.assignedUserId || task.responsibleUserId;
+    const substituteId = task.substituteUserId || task.backupUserId;
+    return responsibleId === userId || substituteId === userId;
+  }
+
+  function getTaskStatus(task) {
+    if (task.status === 'completed') return 'completed';
+    if (task.status === 'blocked') return 'blocked';
+    if (task.dueDate) {
+      const due = new Date(`${task.dueDate}T${task.dueTime || '00:00'}:00`);
+      if (!Number.isNaN(due.getTime()) && due < new Date('2025-10-16T18:00:00')) return 'late';
+    }
+    return task.status === 'in_progress' ? 'in_progress' : 'pending';
+  }
+
+  function isTaskOverdue(task) {
+    if (task.status === 'completed' || !task.dueDate) return false;
+    const due = new Date(`${task.dueDate}T${task.dueTime || '00:00'}:00`);
+    return !Number.isNaN(due.getTime()) && due < new Date('2025-10-16T18:00:00');
+  }
+
   function getTaskSummary(userId) {
     const tasks = getStoredTasks();
     return tasks.reduce((summary, task) => {
-      if (task.assignedUserId !== userId) return summary;
+      if (!isTaskAssignedTo(task, userId)) return summary;
+      const status = getTaskStatus(task);
       summary.total += 1;
-      if (task.status === 'completed') summary.completed += 1;
-      if (task.status === 'late' || task.status === 'blocked') summary.pending += 1;
-      if (task.status === 'late') summary.late += 1;
+      if (status === 'completed') summary.completed += 1;
+      else summary.pending += 1;
+      if (isTaskOverdue(task)) summary.late += 1;
       return summary;
     }, { total: 0, pending: 0, completed: 0, late: 0 });
   }
@@ -221,16 +251,16 @@
   function openUserView(userId) {
     const user = state.users.find(item => item.id === userId);
     if (!user) return;
-    const tasks = getStoredTasks().filter(task => task.assignedUserId === userId);
+    const tasks = getStoredTasks().filter(task => isTaskAssignedTo(task, userId));
     const detail = tasks.length ? tasks.map(task => `
       <li style="display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;">
         <div>
           <strong>${task.title}</strong><br>
-          <span>${task.type} · ${task.status}</span>
+          <span>${task.type} · ${getTaskStatus(task)} · ${task.substituteUserId === userId || task.backupUserId === userId ? 'Suplente' : 'Responsable'}</span>
         </div>
         <label style="display:flex;align-items:center;gap:6px;">
           <span style="font-size:12px;color:var(--users-muted);">Reasignar</span>
-          <select data-reassign-task="${task.id}">
+          <select data-reassign-task="${task.id}" data-assignee-role="${task.substituteUserId === userId || task.backupUserId === userId ? 'substitute' : 'responsible'}">
             ${state.users.filter(u => u.active).map(u => `<option value="${u.id}" ${u.id === user.id ? 'selected' : ''}>${u.name}</option>`).join('')}
           </select>
         </label>
@@ -258,10 +288,18 @@
     `;
     document.querySelectorAll('[data-reassign-task]').forEach(select => {
       select.addEventListener('change', e => {
-        const task = getStoredTasks().find(item => item.id === e.target.dataset.reassignTask);
+        const tasks = getStoredTasks();
+        const task = tasks.find(item => item.id === e.target.dataset.reassignTask);
         if (!task) return;
-        task.assignedUserId = e.target.value;
-        localStorage.setItem(TASK_STORAGE_KEY, JSON.stringify(getStoredTasks()));
+        const role = e.target.dataset.assigneeRole;
+        if (role === 'substitute') {
+          task.substituteUserId = e.target.value;
+          if (task.backupUserId) task.backupUserId = e.target.value;
+        } else {
+          task.assignedUserId = e.target.value;
+          if (task.responsibleUserId) task.responsibleUserId = e.target.value;
+        }
+        localStorage.setItem(TASK_STORAGE_KEY, JSON.stringify(tasks));
         notify('Tarea reasignada correctamente');
         render();
         closeUserModal();

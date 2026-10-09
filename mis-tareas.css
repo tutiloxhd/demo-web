@@ -314,7 +314,7 @@
 
 .task-item {
   display: grid;
-  grid-template-columns: 28px minmax(0, 1.8fr) minmax(0, 1.1fr) minmax(0, 1.05fr) minmax(0, 0.9fr) minmax(0, 0.9fr) minmax(0, 0.7fr) auto auto;
+  grid-template-columns: 28px minmax(0, 1.8fr) minmax(0, 1.15fr) minmax(0, 1fr) minmax(0, 0.8fr) auto auto auto;
   align-items: center;
   gap: 10px;
   padding: 14px 16px;
@@ -354,6 +354,40 @@
   text-overflow: ellipsis;
 }
 
+.task-property-link {
+  color: inherit;
+  text-decoration: none;
+}
+
+.task-property-link:hover,
+.task-property-link:focus-visible {
+  color: var(--task-blue);
+  text-decoration: underline;
+}
+
+.workflow-task-notice {
+  padding: 12px 14px;
+  border: 1px solid var(--task-border);
+  border-radius: 10px;
+  background: var(--task-blue-soft);
+  color: var(--task-navy);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+.workflow-task-link {
+  align-self: center;
+  color: var(--task-blue);
+  font-size: 0.8125rem;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.workflow-task-link:hover,
+.workflow-task-link:focus-visible {
+  text-decoration: underline;
+}
+
 .task-meta {
   color: var(--task-navy);
   font-size: 0.6875rem;
@@ -365,6 +399,18 @@
   font-size: 0.6875rem;
   font-weight: 600;
   margin-bottom: 4px;
+}
+
+.task-due-relative,
+.task-substitute {
+  display: block;
+  margin-top: 3px;
+  color: var(--task-muted);
+  font-size: 0.65rem;
+}
+
+.task-due-relative.is-late {
+  color: var(--task-red);
 }
 
 .task-status,
@@ -502,6 +548,14 @@
   gap: 10px;
   padding: 8px 0;
   border-bottom: 1px solid var(--task-border);
+  width: 100%;
+  border-top: 0;
+  border-right: 0;
+  border-left: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
   cursor: pointer;
 }
 
@@ -532,6 +586,16 @@
   font-size: 0.68rem;
 }
 
+.task-mini-item > div {
+  min-width: 0;
+}
+
+.task-mini-item > div > span {
+  display: block;
+  color: var(--task-navy);
+  font-size: 0.75rem;
+}
+
 .task-mini-item .priority-pill {
   margin-left: auto;
 }
@@ -560,6 +624,14 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+}
+
+.workload-bars h4,
+.workload-subheading {
+  margin: 4px 0 2px;
+  color: var(--task-navy);
+  font-size: 0.75rem;
+  font-weight: 700;
 }
 
 .workload-row {
@@ -1158,11 +1230,12 @@
     padding: 12px 10px;
   }
 
-  .task-item > *:not(:first-child):not(.task-main):not(.task-checkbox) {
-    display: none;
-  }
-
-  .task-main {
+  .task-main,
+  .task-item > .task-meta,
+  .task-item > .task-type,
+  .task-item > .task-status,
+  .task-item > .task-priority,
+  .task-item > .task-actions {
     grid-column: 2;
   }
 
