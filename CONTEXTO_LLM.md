@@ -235,7 +235,10 @@ La app debe funcionar completa en escritorio, tablet y teléfono; no hay pantall
 
 - `shell.js` inserta la barra lateral donde encuentre `[data-side]` y la navegación inferior donde encuentre `[data-mobile-nav]`. La sección activa sale de `<body data-page>` (`inicio`, `mis-tareas`, `semana`, `documentos`, `reportes`, `usuarios`).
 - Remates, Equipos y Configuración aparecen deshabilitados en la barra lateral: no tienen pantalla.
-- La marca es «InmoRemates» y la barra lateral es azul oscuro (`styles.css`, sección «Barra lateral oscura»). La navegación inferior de tablet y teléfono sigue siendo clara.
+- **Marca:** GrupoHouse. El logo es `logohouse.png` (PNG transparente, «Grupo» en gris y «House» en negro) y va en la barra lateral y, en tablet y teléfono, en la cabecera del tablero. El nombre no se escribe como texto en la interfaz; los títulos de pestaña dicen «· GrupoHouse».
+- **Paleta:** neutra, tomada del logo (`styles.css`, sección «Marca GrupoHouse»). Negro para texto, botones principales y elemento activo; grises neutros para bordes, fondos y texto secundario. Los únicos colores con tono son los de estado: rojo, ámbar, verde y violeta. Las variables conservan sus nombres antiguos (`--blue`, `--navy`, `--task-blue`) aunque ya no son azules. No introducir azul ni otros acentos.
+- **Tipografía:** los titulares (`h1`, `h2`, `h3`) usan una sans geométrica cercana a la del logo (Century Gothic y equivalentes); el resto sigue en Inter/system-ui.
+- La barra lateral es blanca, con el ítem activo en negro. La navegación inferior de tablet y teléfono también es clara.
 - Hasta 1100 px se oculta la barra lateral y aparece la navegación inferior. Toda pantalla con grilla propia para la barra lateral debe soltar esa columna en el mismo punto.
 - Hasta 760 px la tabla del tablero pasa a tarjetas, el detalle y el modal de flujo ocupan toda la pantalla y el modal de cada paso sube como hoja inferior.
 - El diagrama es horizontal desde 1001 px (si no cabe, se abre con el zoom ajustado al ancho) y pasa a línea de tiempo vertical hasta 1000 px, con el mismo marcado.
@@ -277,12 +280,16 @@ Lo que se construyó, en orden, partiendo de un tablero con siete remates y un d
 10. Revisión y corrección de Mis tareas y Gestor de usuarios (solo arreglos, sin funcionalidad nueva):
     - datos de ejemplo unificados en `tareas-data.js`; antes el Gestor mostraba cero tareas y reasignar no guardaba;
     - un solo criterio de estado y de fechas; grupos sin tareas repetidas y con las tareas futuras, que antes no aparecían;
-    - en tablet y teléfono las tareas vuelven a mostrar vencimiento, estado y el botón para abrirlas, y el Gestor pasa a tarjetas;m => `${m}
+    - en tablet y teléfono las tareas vuelven a mostrar vencimiento, estado y el botón para abrirlas, y el Gestor pasa a tarjetas;
+    - textos en español, texto escapado, monto de garantía corregido y datos de ejemplo corregidos.
 11. Conexión de usuarios, responsables y tareas:
-    - los pasos del workflow, sus transiciones y los usuarios pasaron a \`data.js\` como fuente única;
+    - los pasos del workflow, sus transiciones y los usuarios pasaron a `data.js` como fuente única;
     - las tareas de Mis tareas se generan desde el workflow y completarlas avanza el remate;
     - el responsable de cada remate es el usuario al que le toca su tarea actual, y los remates tienen gestor y postor asignados;
-    - desactivar un usuario usa un modal propio.m=>m+"\n13. Fusión con la rama de Cat-1114 (commit «agregue algunas cosas»), que había seguido trabajando sobre la lista de tareas guardada. Se mantuvo la versión conectada con el workflow y se trajeron sus aportes: suplentes por tarea, enlace al remate en cada fila, «Restablecer» sobre todos los filtros, búsqueda por etapa y prioridad, grupos «posteriores» y «sin vencimiento» ordenados por plazo, próximos vencimientos solo con tareas vigentes, desglose por estado y el aviso para tareas que se gestionan desde el flujo. No se conservó `mis-tareas-data.js` (la lista fija de tareas), porque las tareas ahora se generan desde los remates."
+    - desactivar un usuario usa un modal propio.
+12. Rediseño de Mis tareas según la referencia del cliente (grupos de color contraíbles, fila con plazo relativo y una etiqueta, menú «⋯», línea de tiempo, dona y tipos) y campo `dueAt` en los remates.
+13. Fusión con la rama de Cat-1114 (commit «agregue algunas cosas»), que había seguido trabajando sobre la lista de tareas guardada. Se mantuvo la versión conectada con el workflow y se trajeron sus aportes: suplentes por tarea, enlace al remate en cada fila, «Restablecer» sobre todos los filtros, búsqueda por etapa y prioridad, grupos «posteriores» y «sin vencimiento» ordenados por plazo, próximos vencimientos solo con tareas vigentes, desglose por estado y el aviso para tareas que se gestionan desde el flujo. No se conservó `mis-tareas-data.js` (la lista fija de tareas), porque las tareas ahora se generan desde los remates.
+14. Identidad GrupoHouse: se quitó el nombre InmoRemates, se incorporó el logo `logohouse.png` y toda la app pasó de la paleta azul a una neutra en negro y gris, manteniendo los colores de estado.
 
 Pendientes conversados y no hechos:
 

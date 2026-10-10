@@ -56,7 +56,7 @@
     els.tasksToast.classList.remove('show');
     void els.tasksToast.offsetWidth;
     els.tasksToast.classList.add('show');
-    els.tasksToast.style.background = type === 'error' ? '#ef1d2d' : '#0b1f44';
+    els.tasksToast.style.background = type === 'error' ? '#ef1d2d' : '#181817';
     clearTimeout(notify.timer);
     notify.timer = setTimeout(() => els.tasksToast.classList.remove('show'), 2200);
   }
@@ -284,8 +284,8 @@
     const buckets = [
       { label: 'Atrasadas', color: '#ef1d2d', test: task => task.status === 'late' },
       { label: 'Vencen hoy', color: '#f0a000', test: dueToday },
-      { label: 'Resto de la semana', color: '#1268f3', test: task => open(task) && T.inThisWeek(task) },
-      { label: 'Próximas', color: '#b9c6d8', test: open },
+      { label: 'Resto de la semana', color: '#1c1c1a', test: task => open(task) && T.inThisWeek(task) },
+      { label: 'Próximas', color: '#c9c9c8', test: open },
       { label: 'Completadas', color: '#16a559', test: () => true }
     ].map(bucket => ({ ...bucket, count: 0 }));
     tasks.forEach(task => { buckets.find(bucket => bucket.test(task)).count += 1; });
@@ -308,7 +308,7 @@
       <div class="donut-wrap">
         <div class="donut">
           <svg viewBox="0 0 120 120" role="img" aria-label="Carga de trabajo: ${plural(total, 'tarea', 'tareas')}">
-            <circle cx="60" cy="60" r="48" stroke="#eef2f7"></circle>
+            <circle cx="60" cy="60" r="48" stroke="#f3f3f2"></circle>
             ${segments}
           </svg>
           <div class="donut-center"><strong>${total}</strong><span>${total === 1 ? 'tarea' : 'tareas'}</span></div>
@@ -319,10 +319,10 @@
       </div>
     `;
     const statusRows = [
-      { label: 'Pendientes', key: 'pending', color: '#1268f3' },
+      { label: 'Pendientes', key: 'pending', color: '#1c1c1a' },
       { label: 'En curso', key: 'in_progress', color: '#6b43d6' },
       { label: 'Atrasadas', key: 'late', color: '#ef1d2d' },
-      { label: 'Bloqueadas', key: 'blocked', color: '#57657d' },
+      { label: 'Bloqueadas', key: 'blocked', color: '#5f5f5e' },
       { label: 'Completadas', key: 'completed', color: '#16a559' }
     ].map(row => ({ ...row, value: tasks.filter(task => task.status === row.key).length }));
     els.workloadSummary.insertAdjacentHTML('beforeend', `

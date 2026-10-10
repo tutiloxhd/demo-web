@@ -14,7 +14,7 @@
     const SIDE = [NAV[0], { page: 'remates', icon: 'hammer', label: 'Remates' }, NAV[1], NAV[2], NAV[3], NAV[4], null, { page: 'equipos', icon: 'users', label: 'Equipos' }, { page: 'configuracion', icon: 'settings', label: 'Configuración' }, NAV[5]];
     const icon = name => `<svg class="icon"><use href="#${name}"/></svg>`;
     const button = (item, active) => `<button type="button" class="${item.page === active ? 'active' : ''}" ${item.href ? `data-go="${item.href}"` : 'disabled'}>${icon(item.icon)}${item.label}</button>`;
-    const sidebar = active => `<aside class="side"><div class="brand">${icon('home')}<span>Inmo<b>Remates</b></span></div><nav class="nav">${SIDE.map(item => item ? button(item, active) : '<div class="rule"></div>').join('')}</nav><div class="version">Maqueta navegable · v1.0</div></aside>`;
+    const sidebar = active => `<aside class="side"><div class="brand"><img class="brand-logo" src="logohouse.png" alt="GrupoHouse"></div><nav class="nav">${SIDE.map(item => item ? button(item, active) : '<div class="rule"></div>').join('')}</nav><div class="version">Maqueta navegable · v1.0</div></aside>`;
     const mobileNav = active => `<nav class="mobile-nav" aria-label="Secciones">${NAV.map(item => button(item, active)).join('')}</nav>`;
 
     function mount(root = document) {

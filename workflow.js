@@ -121,9 +121,9 @@ function renderFlowDiagram(item, entering) {
                     <span style="--dot:#16a559"><i></i>Completada</span>
                     <span style="--dot:#f5a400"><i></i>En proceso</span>
                     <span style="--dot:#ef1d2d"><i></i>Atrasada</span>
-                    <span style="--dot:#b9c6d8"><i></i>Pendiente</span>
+                    <span style="--dot:#c9c9c8"><i></i>Pendiente</span>
                     <span style="--dot:#6a4be0"><i></i>Suspendido</span>
-                    <span style="--dot:#3f4d63"><i></i>Cancelado</span>
+                    <span style="--dot:#494948"><i></i>Cancelado</span>
                     <span class="dashed"><i></i>En paralelo</span>
                 </div>
                 <div class="wf-zoom">

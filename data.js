@@ -55,14 +55,14 @@
   const USER_KEY='remates-demo-users';
   const USER_ROLES={'Administrador':'admin','Gestor de remates':'gestor','Responsable de participación':'postor','Responsable de revisión legal':'legal'};
   const DEFAULT_USERS=[
-    {id:'u1',name:'María González',email:'maria.gonzalez@inmoremates.cl',role:'Administrador',team:'Dirección',active:true,avatar:'https://i.pravatar.cc/80?img=47'},
-    {id:'u2',name:'Juan Pérez',email:'juan.perez@inmoremates.cl',role:'Gestor de remates',team:'Gestión',active:true,avatar:'https://i.pravatar.cc/80?img=12'},
-    {id:'u3',name:'Carla Rojas',email:'carla.rojas@inmoremates.cl',role:'Gestor de remates',team:'Gestión',active:true,avatar:'https://i.pravatar.cc/80?img=32'},
-    {id:'u4',name:'Diego Torres',email:'diego.torres@inmoremates.cl',role:'Responsable de participación',team:'Participación',active:true,avatar:'https://i.pravatar.cc/80?img=11'},
-    {id:'u5',name:'Paula Díaz',email:'paula.diaz@inmoremates.cl',role:'Responsable de revisión legal',team:'Legal',active:false,avatar:'https://i.pravatar.cc/80?img=44'},
-    {id:'u6',name:'Andrea Silva',email:'andrea.silva@inmoremates.cl',role:'Gestor de remates',team:'Gestión',active:true,avatar:'https://i.pravatar.cc/80?img=45'},
-    {id:'u7',name:'Carlos Soto',email:'carlos.soto@inmoremates.cl',role:'Responsable de participación',team:'Participación',active:true,avatar:'https://i.pravatar.cc/80?img=15'},
-    {id:'u8',name:'Felipe Morales',email:'felipe.morales@inmoremates.cl',role:'Responsable de revisión legal',team:'Legal',active:true,avatar:'https://i.pravatar.cc/80?img=53'}
+    {id:'u1',name:'María González',email:'maria.gonzalez@grupohouse.cl',role:'Administrador',team:'Dirección',active:true,avatar:'https://i.pravatar.cc/80?img=47'},
+    {id:'u2',name:'Juan Pérez',email:'juan.perez@grupohouse.cl',role:'Gestor de remates',team:'Gestión',active:true,avatar:'https://i.pravatar.cc/80?img=12'},
+    {id:'u3',name:'Carla Rojas',email:'carla.rojas@grupohouse.cl',role:'Gestor de remates',team:'Gestión',active:true,avatar:'https://i.pravatar.cc/80?img=32'},
+    {id:'u4',name:'Diego Torres',email:'diego.torres@grupohouse.cl',role:'Responsable de participación',team:'Participación',active:true,avatar:'https://i.pravatar.cc/80?img=11'},
+    {id:'u5',name:'Paula Díaz',email:'paula.diaz@grupohouse.cl',role:'Responsable de revisión legal',team:'Legal',active:false,avatar:'https://i.pravatar.cc/80?img=44'},
+    {id:'u6',name:'Andrea Silva',email:'andrea.silva@grupohouse.cl',role:'Gestor de remates',team:'Gestión',active:true,avatar:'https://i.pravatar.cc/80?img=45'},
+    {id:'u7',name:'Carlos Soto',email:'carlos.soto@grupohouse.cl',role:'Responsable de participación',team:'Participación',active:true,avatar:'https://i.pravatar.cc/80?img=15'},
+    {id:'u8',name:'Felipe Morales',email:'felipe.morales@grupohouse.cl',role:'Responsable de revisión legal',team:'Legal',active:true,avatar:'https://i.pravatar.cc/80?img=53'}
   ];
   const savedUsers=JSON.parse(localStorage.getItem(USER_KEY)||'null');
   let users=Array.isArray(savedUsers)&&savedUsers.length?savedUsers:JSON.parse(JSON.stringify(DEFAULT_USERS));

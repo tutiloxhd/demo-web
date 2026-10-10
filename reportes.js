@@ -6,7 +6,7 @@ const STATUS_INFO = [
     ['ALERTA', 'En alerta', '#f0a000'],
     ['BIEN', 'Bien', '#16a559'],
     ['SUSPENDIDO', 'Suspendido', '#6a4be0'],
-    ['CANCELADO', 'Cancelado', '#5d6f89']
+    ['CANCELADO', 'Cancelado', '#676766']
 ];
 const PHASES = [['Asignación', 1, 2], ['Vale Vista y formulario', 3, 6], ['Entrega en juzgado', 7, 10], ['Preparación del remate', 11, 13], ['Remate y resultado', 14, 16]];
 const WEEK_OFFSETS = [-1, 0, 1, 2];

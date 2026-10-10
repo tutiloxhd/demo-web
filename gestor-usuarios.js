@@ -35,7 +35,7 @@
     els.usersToast.classList.remove('show');
     void els.usersToast.offsetWidth;
     els.usersToast.classList.add('show');
-    els.usersToast.style.background = type === 'error' ? '#ef1d2d' : '#0b1f44';
+    els.usersToast.style.background = type === 'error' ? '#ef1d2d' : '#181817';
     clearTimeout(notify.timer);
     notify.timer = setTimeout(() => els.usersToast.classList.remove('show'), 2200);
   }

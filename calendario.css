@@ -10,8 +10,8 @@
 
 body {
     font-family: Arial, Helvetica, sans-serif;
-    background: #f5f7fa;
-    color: #14213d;
+    background: #f8f8f7;
+    color: #181817;
 }
 
 
@@ -53,11 +53,11 @@ body {
     justify-content: center;
 
     background: white;
-    border: 1px solid #dfe6ef;
+    border: 1px solid #e7e7e6;
     border-radius: 10px;
 
     text-decoration: none;
-    color: #19385f;
+    color: #242423;
 
     font-size: 25px;
 }
@@ -66,7 +66,7 @@ body {
     display: block;
     margin-bottom: 5px;
 
-    color: #2478f2;
+    color: #1c1c1a;
 
     font-size: 10px;
     font-weight: 700;
@@ -75,7 +75,7 @@ body {
 
 .calendar-header h1 {
     font-size: 25px;
-    color: #14213d;
+    color: #181817;
 }
 
 
@@ -92,12 +92,12 @@ body {
     width: 42px;
     height: 42px;
 
-    border: 1px solid #dfe6ef;
+    border: 1px solid #e7e7e6;
     border-radius: 10px;
 
     background: white;
 
-    color: #355d8c;
+    color: #575756;
 
     font-size: 25px;
 
@@ -105,7 +105,7 @@ body {
 }
 
 .week-button:hover {
-    background: #f5f8fc;
+    background: #f9f9f8;
 }
 
 
@@ -116,13 +116,13 @@ body {
 .calendar {
     background: white;
 
-    border: 1px solid #e1e7ee;
+    border: 1px solid #e8e8e7;
 
     border-radius: 15px;
 
     overflow: hidden;
 
-    box-shadow: 0 3px 15px rgba(30, 50, 80, 0.05);
+    box-shadow: 0 3px 15px rgba(33,33,32,0.05);
 }
 
 
@@ -135,7 +135,7 @@ body {
 
     min-height: 105px;
 
-    border-bottom: 1px solid #e7ebf0;
+    border-bottom: 1px solid #ececeb;
 }
 
 .day-group:last-child {
@@ -158,14 +158,14 @@ body {
     align-items: center;
     justify-content: center;
 
-    background: #fbfcfd;
+    background: #fcfcfb;
 
-    border-right: 1px solid #e3e8ef;
+    border-right: 1px solid #e9e9e8;
 }
 
 .day-column span {
     font-size: 14px;
-    color: #5f728d;
+    color: #6a6a69;
 }
 
 .day-column strong {
@@ -173,7 +173,7 @@ body {
 
     font-size: 27px;
 
-    color: #14213d;
+    color: #181817;
 }
 
 
@@ -204,7 +204,7 @@ body {
 
     padding: 18px 20px;
 
-    border-bottom: 1px solid #edf0f3;
+    border-bottom: 1px solid #f0f0ef;
 
     text-decoration: none;
 
@@ -218,7 +218,7 @@ body {
 }
 
 .event-card:hover {
-    background: #f8fafc;
+    background: #fafaf9;
 }
 
 
@@ -235,7 +235,7 @@ body {
 
     font-weight: 600;
 
-    color: #263e5d;
+    color: #3b3b3a;
 }
 
 
@@ -254,12 +254,12 @@ body {
 
 .event-info strong {
     font-size: 15px;
-    color: #14213d;
+    color: #181817;
 }
 
 .event-info span {
     font-size: 14px;
-    color: #617590;
+    color: #6c6c6b;
 }
 
 
@@ -312,7 +312,7 @@ body {
 
 .event-arrow {
     font-size: 25px;
-    color: #7387a0;
+    color: #7c7c7b;
 }
 
 
@@ -384,20 +384,23 @@ body {
 .mobile-nav .icon { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
 
 @media (max-width: 1100px) {
-    .mobile-nav { display: flex; position: fixed; right: 0; bottom: 0; left: 0; z-index: 10; height: calc(66px + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom); border-top: 1px solid #dfe7f2; background: #fff; }
-    .mobile-nav button { display: grid; flex: 1; place-content: center; place-items: center; gap: 3px; border: 0; background: none; color: #526b91; font: inherit; font-size: 11px; cursor: pointer; }
-    .mobile-nav .active { color: #1268f3; font-weight: 700; }
+    .mobile-nav { display: flex; position: fixed; right: 0; bottom: 0; left: 0; z-index: 10; height: calc(66px + env(safe-area-inset-bottom)); padding-bottom: env(safe-area-inset-bottom); border-top: 1px solid #e9e9e8; background: #fff; }
+    .mobile-nav button { display: grid; flex: 1; place-content: center; place-items: center; gap: 3px; border: 0; background: none; color: #666665; font: inherit; font-size: 11px; cursor: pointer; }
+    .mobile-nav .active { color: #1c1c1a; font-weight: 700; }
 }
 
 /* Estados y días que agrega calendario.js */
 .status.suspendido { background: #e9e5ff; color: #5334c4; }
-.status.cancelado { background: #e3e7ee; color: #3f4d63; }
-.event-card.vacio, .event-card.vacio:hover { background: transparent; color: #8a97aa; font-size: 14px; cursor: default; }
+.status.cancelado { background: #e9e9e8; color: #494948; }
+.event-card.vacio, .event-card.vacio:hover { background: transparent; color: #9a9a99; font-size: 14px; cursor: default; }
 
 /* Barra de scroll */
 ::-webkit-scrollbar{width:12px;height:12px}
 ::-webkit-scrollbar-track{background:transparent}
-::-webkit-scrollbar-thumb{border:3px solid transparent;border-radius:99px;background:#c3cfdf;background-clip:content-box}
-::-webkit-scrollbar-thumb:hover{background-color:#8fa3bd}
+::-webkit-scrollbar-thumb{border:3px solid transparent;border-radius:99px;background:#d1d1d0;background-clip:content-box}
+::-webkit-scrollbar-thumb:hover{background-color:#a6a6a5}
 ::-webkit-scrollbar-corner{background:transparent}
-@supports not selector(::-webkit-scrollbar){*{scrollbar-width:thin;scrollbar-color:#c3cfdf transparent}}
+@supports not selector(::-webkit-scrollbar){*{scrollbar-width:thin;scrollbar-color:#d1d1d0 transparent}}
+
+/* Titulares con la tipografía geométrica de la marca */
+h1 { font-family: "Century Gothic","Avenir Next",Futura,"Jost",Inter,system-ui,sans-serif; }
