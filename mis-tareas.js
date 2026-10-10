@@ -221,7 +221,7 @@
         <input class="task-checkbox" type="checkbox" data-task-check="${task.id}" ${task.status === 'completed' ? 'checked disabled' : ''}>
         <div class="task-main">
           <span class="task-title">${escapeHtml(task.title)}</span>
-          <span class="task-property"><a class="task-property-link" href="hello.html?id=${task.propertyId}">${escapeHtml(task.propertyTitle)}</a> · ${escapeHtml(task.propertyPlace)}</span>
+          <span class="task-property"><a class="task-property-link" href="index.html?id=${task.propertyId}">${escapeHtml(task.propertyTitle)}</a> · ${escapeHtml(task.propertyPlace)}</span>
         </div>
         <div class="task-due ${dueUrgency(task)}">
           <span class="task-due-date">${svgIcon('calendar')}${task.dueAt ? formatDate(task.dueDate, task.dueTime) : escapeHtml(task.dueText)}</span>
@@ -395,7 +395,7 @@
     menu.dataset.task = task.id;
     menu.setAttribute('role', 'menu');
     menu.innerHTML = actions.map(([action, label]) => `<button type="button" role="menuitem" data-menu-action="${action}">${label}</button>`).join('')
-      + `<a role="menuitem" href="hello.html?id=${task.propertyId}">Ver remate</a>`;
+      + `<a role="menuitem" href="index.html?id=${task.propertyId}">Ver remate</a>`;
     document.body.append(menu);
     const rect = button.getBoundingClientRect();
     menu.style.top = `${Math.max(8, Math.min(innerHeight - menu.offsetHeight - 8, rect.bottom + 6))}px`;
@@ -651,7 +651,7 @@
 
           <div class="task-modal-actions">
             ${locked ? '' : '<button type="submit" class="primary-action">Guardar cambios</button>'}
-            <a class="secondary-action" href="hello.html?id=${task.propertyId}">Ver remate</a>
+            <a class="secondary-action" href="index.html?id=${task.propertyId}">Ver remate</a>
             <button type="button" class="secondary-action" data-close-task-modal="true">Cerrar</button>
           </div>
         </form>
@@ -702,7 +702,7 @@
           El resultado del remate se registra desde su flujo, donde se elige la rama y se ven sus dependencias. No se modifica desde Mis tareas.
         </div>
         <div class="task-modal-actions">
-          <a class="workflow-task-link" href="hello.html?id=${task.propertyId}">Abrir remate en Workflow</a>
+          <a class="workflow-task-link" href="index.html?id=${task.propertyId}">Abrir remate en Workflow</a>
           <button type="button" class="secondary-action" data-close-task-modal="true">Cerrar</button>
         </div>
       </div>

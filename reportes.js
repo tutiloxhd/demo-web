@@ -62,7 +62,7 @@ function attentionCard(d) {
         ...d.suspended.map(x => [x, `Detenido en «${x.stage}»`]),
         ...d.alert.map(x => [x, guaranteePending(x) ? `Garantía por recuperar: ${money(guarantee(x))}` : x.due])
     ];
-    const rows = issues.slice(0, 6).map(([x, issue]) => `<a class="issue" href="hello.html?id=${x.id}">
+    const rows = issues.slice(0, 6).map(([x, issue]) => `<a class="issue" href="index.html?id=${x.id}">
         <span class="status ${statusClass(x.status)}">${x.status}</span>
         <span><b>${x.title}</b><small>${x.place} · ${x.date}</small></span>
         <span><b>${issue}</b><small>${x.stage}</small></span>
@@ -181,7 +181,7 @@ function renderReports() {
     bindWeek(renderReports);
     document.querySelectorAll('[data-scope]').forEach(b => { b.onclick = () => { scope = b.dataset.scope; renderReports(); }; });
     document.querySelectorAll('[data-go-week]').forEach(b => { b.onclick = () => { scope = 'week'; week = R.setWeek(Number(b.dataset.goWeek)); renderReports(); }; });
-    document.querySelectorAll('.rp-table tbody tr').forEach(row => { row.onclick = () => { location.href = `hello.html?id=${row.dataset.id}`; }; });
+    document.querySelectorAll('.rp-table tbody tr').forEach(row => { row.onclick = () => { location.href = `index.html?id=${row.dataset.id}`; }; });
     document.querySelector('#exportCsv').onclick = () => downloadCsv(d);
     document.querySelector('#exportPdf').onclick = () => window.print();
 }

@@ -319,6 +319,6 @@ document.addEventListener('keydown', event => {
     }
 });
 render();
-// Permite enlazar directo al detalle de un remate: hello.html?id=3
+// Permite enlazar directo al detalle de un remate: index.html?id=3
 const linkedId = Number(new URLSearchParams(location.search).get('id'));
 if (linkedId) openDetail(linkedId);

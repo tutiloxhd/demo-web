@@ -8,7 +8,7 @@
 
     function eventCard(x) {
         const state = STATUS_CLASS[x.status] || 'bien';
-        return `<a href="hello.html?id=${x.id}" class="event-card ${state}">
+        return `<a href="index.html?id=${x.id}" class="event-card ${state}">
             <div class="event-time">${x.time}</div>
             <div class="event-info"><strong>${x.title}</strong><span>${x.place}</span></div>
             <span class="status ${state}">${x.status}</span>

@@ -9,7 +9,7 @@ Es un prototipo de frontend estático, no un sistema de producción. No hay serv
 ## Tecnologías y ejecución
 
 - HTML, CSS y JavaScript vanilla, sin framework, gestor de paquetes ni build.
-- El inicio es `hello.html`. Alcanza con abrirlo en un navegador o servir la carpeta como archivos estáticos.
+- El inicio es `index.html`. Alcanza con abrirlo en un navegador o servir la carpeta como archivos estáticos.
 - Los scripts son clásicos (no módulos) y comparten el ámbito global; el orden de carga importa (ver «Orden de carga»).
 - Los cambios del workflow se guardan en `localStorage` bajo `remates-demo-state`. La semana visible se guarda en `sessionStorage` bajo `remates-demo-week`.
 - Las fotos y avatares apuntan a Unsplash y Pravatar, por lo que necesitan conexión a Internet.
@@ -20,7 +20,7 @@ Es un prototipo de frontend estático, no un sistema de producción. No hay serv
 | --- | --- |
 | `data.js` | Fuente única de los datos y del dominio: remates, definición del workflow (pasos y ramas), usuarios, responsables y semana visible. Expone `window.RematesData`. |
 | `shell.js` | Barra lateral, navegación inferior y sprite de íconos SVG, compartidos por todas las pantallas. |
-| `hello.html` | Tablero de inicio: métricas, lista de remates, «Requiere atención», panel de detalle y los dos modales (flujo y paso). |
+| `index.html` | Tablero de inicio: métricas, lista de remates, «Requiere atención», panel de detalle y los dos modales (flujo y paso). |
 | `app.js` | Tablero (render, filtros, detalle) e interfaz del workflow: avanzar tareas, ramas de resultado, suspender, cancelar y reanudar. Los pasos y sus transiciones los toma de `data.js`. |
 | `workflow.js`, `workflow.css` | Vista «diagrama» del modal de flujo y modal de cada paso. Solo dibuja; los cambios de estado los delega en `app.js`. |
 | `styles.css` | Estilos base, tablero, panel de detalle, modal de flujo en lista, estados, responsive y barra de scroll. |
@@ -37,7 +37,7 @@ Es un prototipo de frontend estático, no un sistema de producción. No hay serv
 
 ### Orden de carga
 
-- `hello.html`: `data.js` → `shell.js` → `app.js` → `workflow.js`
+- `index.html`: `data.js` → `shell.js` → `app.js` → `workflow.js`
 - `semana.html`: `data.js` → `shell.js` → `calendario.js`
 - `documentos.html`: `data.js` → `shell.js` → `pages.js`
 - `reportes.html`: `data.js` → `shell.js` → `pages.js` → `reportes.js`
@@ -86,13 +86,13 @@ Estados (`status`): `ATRASADO`, `ALERTA`, `BIEN`, `SUSPENDIDO`, `CANCELADO`. Sus
 
 `app.js` trabaja sobre una copia de `items` (`data`) y la sincroniza con lo que devuelve `update`.
 
-## Tablero (`hello.html` + `app.js`)
+## Tablero (`index.html` + `app.js`)
 
 - La lista combina tres filtros en `render`: la semana visible (`week`), la tarjeta de métrica activa (`statusFilter`) y el texto del buscador.
 - Las cinco tarjetas de métricas (Remates, En alerta, Atrasado, Bien, Detenidos) son botones que filtran por estado; «Detenidos» agrupa suspendidos y cancelados. Las métricas y «Requiere atención» se calculan sobre la semana visible.
 - El buscador mira título, comuna, fecha, hora, etapa, responsable y estado, solo dentro de la semana visible.
 - «Requiere atención» lista los atrasados y en alerta; sus filas abren el detalle.
-- Tocar un remate abre el panel de detalle. `hello.html?id=<id>` lo abre directamente; así enlazan el calendario y Reportes.
+- Tocar un remate abre el panel de detalle. `index.html?id=<id>` lo abre directamente; así enlazan el calendario y Reportes.
 - En el detalle, «Ver flujo completo →» abre el diagrama y el botón de la flecha abre la lista de tareas.
 
 ## Workflow del remate
